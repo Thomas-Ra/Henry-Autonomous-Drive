@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BotLibrary
+namespace HwrBerlin.Bot.Scanner
 {
-    public class Class1
+    class Commands
     {
+
     }
 }
