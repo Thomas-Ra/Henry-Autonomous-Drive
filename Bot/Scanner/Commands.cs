@@ -36,6 +36,12 @@ namespace HwrBerlin.Bot.Scanner
             TX_RS422_485_4WIRE
         }
 
+        /// <summary>
+        /// returns the description value of an enumeration
+        /// </summary>
+        /// <typeparam name="T">the enumeration type</typeparam>
+        /// <param name="enumerationValue">the enumeration value</param>
+        /// <returns>the description</returns>
         private static string GetDescription<T>(this T enumerationValue) where T : struct
         {
             Type type = enumerationValue.GetType();
@@ -48,13 +54,20 @@ namespace HwrBerlin.Bot.Scanner
 
         private static bool CriticalCommands = false;
 
+        /// <summary>
+        /// activates to receive critical commands
+        /// </summary>
         public static void ActivateCriticalCommands()
         {
             CriticalCommands = true;
         }
 
 
-
+        /// <summary>
+        /// generates the message which will be send to the laser scanner
+        /// </summary>
+        /// <param name="input">the command</param>
+        /// <returns>the request message</returns>
         public static byte[] GenerateMessage(string input)
         {
             byte[] msgBegin = { 0x02 };
@@ -96,6 +109,7 @@ namespace HwrBerlin.Bot.Scanner
         }
 
         // be careful, deletes all parametrization!
+        // is an critical command
         // page 40
         private static string LoadFactoryDefaults()
         {
@@ -110,6 +124,7 @@ namespace HwrBerlin.Bot.Scanner
         }
 
         // be careful, deletes user settings (but keeps field and evaluation settings)
+        // is an critical command
         // page 41
         private static string LoadApplicationDefaults()
         {
@@ -164,13 +179,7 @@ namespace HwrBerlin.Bot.Scanner
         }
 
         // page 58
-        // / <summary>
-        // /     
-        // / </summary>
-        // / <param name="angularResolution"></param>
-        // / <param name="startAngle">-45 to 225</param>
-        // / <param name="stopAngle">-45 to 225</param>
-        // / <returns></returns>
+        // angles from -45 to 225
         public static string ConfigureMeasurementAngle(AngularResolution angularResolution, int startAngle, int stopAngle)
         {
             return "SWN LMPoutputRange"
