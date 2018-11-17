@@ -3,6 +3,9 @@ using System.IO;
 
 namespace HwrBerlin.Bot.Engines
 {
+    /// <summary>
+    /// provides function to control the arm
+    /// </summary>
     public class Arm
     {
         /// <summary>

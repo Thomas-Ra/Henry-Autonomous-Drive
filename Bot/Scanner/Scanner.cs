@@ -8,20 +8,31 @@ using System.Text;
 
 namespace HwrBerlin.Bot.Scanner
 {
+    /// <summary>
+    /// provides function to communicate with the sick TiM5xx laser scanner
+    /// </summary>
     public class Scanner
     {
-        //the ip address of the laser scanner
+        /// <summary>
+        /// the ip adress of the laser scanner
+        /// </summary>
         private readonly string Ip;
 
-        //the port of the laser scanner, by default 2111 or 2112
+        /// <summary>
+        /// the port to communicate with the laser scanner
+        /// </summary>
         private readonly int Port;
-
-        //create a tcp server and connect it to the endpoint of the scanner
+        
         private Socket Socket;
         private NetworkStream NetworkStream;
         private BinaryReader BinaryReader;
         private BinaryWriter BinaryWriter;
         
+        /// <summary>
+        /// initialize the connection to the laser scanner
+        /// </summary>
+        /// <param name="ip">default is 192.168.0.1</param>
+        /// <param name="port">default is 2111</param>
         public Scanner(string ip = "192.168.0.1", int port = 2111)
         {
             Ip = ip;
@@ -49,6 +60,9 @@ namespace HwrBerlin.Bot.Scanner
             }
         }
 
+        /// <summary>
+        /// closes the connection when the laser scanner won't be used anymore
+        /// </summary>
         ~Scanner()
         {
             BinaryReader.Close();
@@ -59,6 +73,11 @@ namespace HwrBerlin.Bot.Scanner
             Socket.Close();
         }
 
+        /// <summary>
+        /// sends a command to the laser scanner and returns the response
+        /// </summary>
+        /// <param name="message">command for the laser scanner</param>
+        /// <returns>the response of the laser scanner</returns>
         public byte[] SendAndReceiveData(byte[] message)
         {
             //send the message
@@ -76,6 +95,10 @@ namespace HwrBerlin.Bot.Scanner
                 }).ToArray();
         }
 
+        /// <summary>
+        ///     returns the current measurement as list of integers from left to right
+        /// </summary>
+        /// <returns>list with the distance in mm</returns>
         public List<int> GetDataList()
         {
             byte[] message = Commands.GenerateMessage(Commands.PollOneTelegram());
@@ -85,9 +108,11 @@ namespace HwrBerlin.Bot.Scanner
 
             string[] values = Encoding.ASCII.GetString(data).Split(new string[] { " " }, StringSplitOptions.None);
 
+            int amountOfData = int.Parse(values[25], System.Globalization.NumberStyles.HexNumber);
+
             //convert hex numbers to int numbers that represent the measured distances
             List<int> distanceData = new List<int>();
-            for (int i = 26; i < 297; i++)
+            for (int i = 25 + amountOfData; i > 25; i--)
             {
                 distanceData.Add(int.Parse(values[i], System.Globalization.NumberStyles.HexNumber));
             }
@@ -95,7 +120,11 @@ namespace HwrBerlin.Bot.Scanner
             return distanceData;
         }
 
-        //apply median filter to scan data to remove outlier values
+        /// <summary>
+        /// applies the median filter for scan data to remove outlier values
+        /// </summary>
+        /// <param name="scanData">the list of the measured values</param>
+        /// <returns>the list of the corrected values</returns>
         public List<int> MedianFilter(List<int> scanData)
         {
             //how many numbers should be compared in each direction

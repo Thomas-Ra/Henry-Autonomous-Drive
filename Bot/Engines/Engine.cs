@@ -4,6 +4,9 @@ using System;
 
 namespace HwrBerlin.Bot.Engines
 {
+    /// <summary>
+    /// provides functions to control directly a EPOS engine
+    /// </summary>
     public class Engine
     {
         /// <summary>

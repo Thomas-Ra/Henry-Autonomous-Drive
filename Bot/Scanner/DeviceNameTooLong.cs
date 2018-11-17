@@ -2,6 +2,9 @@
 
 namespace HwrBerlin.Bot.Scanner
 {
+    /// <summary>
+    /// will be thrown if the device name is too long
+    /// </summary>
     public class DeviceNameTooLong : Exception
     {
         public DeviceNameTooLong()

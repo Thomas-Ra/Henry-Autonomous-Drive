@@ -2,6 +2,9 @@
 
 namespace HwrBerlin.Bot.Scanner
 {
+    /// <summary>
+    /// will be thrown if critical commands aren't activated
+    /// </summary>
     public class CriticalCommandsNotActivated : Exception
     {
         public CriticalCommandsNotActivated()

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace HwrBerlin.Bot.Scanner
 {
+    /// <summary>
+    /// provides commands for the sick TiM5xx laser scanner
+    /// </summary>
     public static class Commands
     {
         public enum BitResolution

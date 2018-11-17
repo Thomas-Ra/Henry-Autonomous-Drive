@@ -2,6 +2,9 @@
 
 namespace HwrBerlin.Bot.Engines
 {
+    /// <summary>
+    /// provides functions to move the robot
+    /// </summary>
     public class Robot
     {
         /// <summary>
@@ -158,11 +161,8 @@ namespace HwrBerlin.Bot.Engines
         /// <returns>returns always true</returns>
         public bool StopByMode()
         {
-            currentWalkMode = WalkMode.STOP;
-            currentTurnMode = TurnMode.STRAIGHT;
-
             //calling moveByMode with WalkMode.STOP and TurnMode.STRAIGHT makes robot stop moving
-            MoveByMode(currentWalkMode, currentTurnMode);
+            MoveByMode(WalkMode.STOP, TurnMode.STRAIGHT);
 
             return true;
         }
@@ -174,8 +174,11 @@ namespace HwrBerlin.Bot.Engines
         /// <param name="turnMode">specifies intensity of lateral movement</param>
         /// <param name="reverseMode">true for driving backwards</param>
         /// <returns>returns always true</returns>
-        private bool MoveByMode(WalkMode walkMode, TurnMode turnMode, bool reverseMode = false)
+        public bool MoveByMode(WalkMode walkMode, TurnMode turnMode, bool reverseMode = false)
         {
+            currentWalkMode = walkMode;
+            currentTurnMode = turnMode;
+
             //velocity for left wheel
             double vel1 = (int)walkMode;
             //velocity for right wheel
