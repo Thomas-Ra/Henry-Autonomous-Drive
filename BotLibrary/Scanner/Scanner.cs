@@ -44,7 +44,7 @@ namespace HwrBerlin.Bot.Scanner
             }
             catch (SocketException e)
             {
-                Console.WriteLine("Failed to connect to server at ip {0}, port {1} throwing exception {2}", Ip, Port);
+                ConsoleFormatter.Error("Failed to connect to server at IP " + Ip + ":" + Port);
                 throw e;
             }
         }

@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{87E21E12-56B3-4840-9209-F9C9132742A7}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>HenryTasks</RootNamespace>
+    <RootNamespace>HwrBerlin.HenryTasks</RootNamespace>
     <AssemblyName>HenryTasks</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -48,6 +48,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BotLibrary.dll" />
+    <Content Include="EposCmd.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EposCmd.Net.dll" />
+    <Content Include="EposCmd64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
