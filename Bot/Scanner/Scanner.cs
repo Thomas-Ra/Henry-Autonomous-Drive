@@ -8,7 +8,7 @@ using System.Text;
 
 namespace HwrBerlin.Bot.Scanner
 {
-    class Scanner
+    public class Scanner
     {
         //the ip address of the laser scanner
         private readonly string Ip;

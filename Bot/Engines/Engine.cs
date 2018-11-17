@@ -4,7 +4,7 @@ using System;
 
 namespace HwrBerlin.Bot.Engines
 {
-    class Engine
+    public class Engine
     {
         /// <summary>
         /// DeviceManager for USB communication

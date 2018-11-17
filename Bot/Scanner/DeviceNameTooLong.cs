@@ -2,7 +2,7 @@
 
 namespace HwrBerlin.Bot.Scanner
 {
-    class DeviceNameTooLong : Exception
+    public class DeviceNameTooLong : Exception
     {
         public DeviceNameTooLong()
         {

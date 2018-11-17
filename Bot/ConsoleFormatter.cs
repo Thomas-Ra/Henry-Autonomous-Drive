@@ -2,7 +2,7 @@
 
 namespace HwrBerlin.Bot
 {
-    static class ConsoleFormatter
+    public static class ConsoleFormatter
     {
         public static void Text(params string[] msg)
         {

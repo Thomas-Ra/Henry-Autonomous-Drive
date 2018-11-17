@@ -2,7 +2,7 @@
 
 namespace HwrBerlin.Bot.Engines
 {
-    class Robot
+    public class Robot
     {
         /// <summary>
         /// robot can move forwards with three different velocities, stop and move backwards

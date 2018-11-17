@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>HwrBerlin.Bot</RootNamespace>
+    <AssemblyName>HwrBerlin.Bot</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="EposCmd.Net">
+      <HintPath>EposCmd.Net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="EposCmd.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EposCmd64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

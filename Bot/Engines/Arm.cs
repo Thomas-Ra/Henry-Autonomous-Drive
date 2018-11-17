@@ -3,7 +3,7 @@ using System.IO;
 
 namespace HwrBerlin.Bot.Engines
 {
-    class Arm
+    public class Arm
     {
         /// <summary>
         /// Engine object is needed to use engine methods

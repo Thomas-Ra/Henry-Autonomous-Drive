@@ -2,7 +2,7 @@
 
 namespace HwrBerlin.Bot.Scanner
 {
-    class CriticalCommandsNotActivated : Exception
+    public class CriticalCommandsNotActivated : Exception
     {
         public CriticalCommandsNotActivated()
         {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace HwrBerlin.Bot.Scanner
 {
-    static class Commands
+    public static class Commands
     {
         public enum BitResolution
         {
