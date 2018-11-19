@@ -6,26 +6,26 @@ using static HwrBerlin.Bot.Engines.Robot;
 
 namespace HwrBerlin.HenryTasks
 {
-    class Program
+    internal class Program
     {
         /// <summary>
         /// user can press keys for four directions
         /// </summary>
         private enum Direction
         {
-            UP,
-            DOWN,
-            RIGHT,
-            LEFT
+            Up,
+            Down,
+            Right,
+            Left
         }
 
 
-        private Robot robot = new Robot();
-        private Arm arm = new Arm();
+        private readonly Robot _robot = new Robot();
+        private readonly Arm _arm = new Arm();
 
-        static void Main(string[] args)
+        private static void Main()
         {
-            Program program = new Program();
+            var program = new Program();
 
             program.Start();
         }
@@ -62,6 +62,10 @@ namespace HwrBerlin.HenryTasks
                     Console.WriteLine("       |       ");
                     Console.WriteLine("       |       ");
                     break;
+                case WalkMode.BACKWARDS:
+                    break;
+                case WalkMode.STOP:
+                    break;
                 default:
                     Console.WriteLine("               ");
                     Console.WriteLine("               ");
@@ -92,6 +96,8 @@ namespace HwrBerlin.HenryTasks
                 case TurnMode.RIGHT_HARD:
                     Console.WriteLine("      ███----> ");
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(turnMode), turnMode, null);
             }
 
             Console.WriteLine("      ███      ");
@@ -103,6 +109,14 @@ namespace HwrBerlin.HenryTasks
                     Console.WriteLine("       |       ");
                     Console.WriteLine("       V       ");
                     break;
+                case WalkMode.STOP:
+                    break;
+                case WalkMode.FORWARDS_SLOW:
+                    break;
+                case WalkMode.FORWARDS_MEDIUM:
+                    break;
+                case WalkMode.FORWARDS_FAST:
+                    break;
                 default:
                     Console.WriteLine("               ");
                     Console.WriteLine("               ");
@@ -113,9 +127,9 @@ namespace HwrBerlin.HenryTasks
 
         public void Start()
         {
-            if (robot.Enable())
+            if (_robot.Enable())
             {
-                string consoleInput = "";
+                var consoleInput = "";
 
                 while (consoleInput != "exit")
                 {
@@ -132,192 +146,162 @@ namespace HwrBerlin.HenryTasks
                         "'task' - starts the task programm");
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
-                    String[] inpurArray = consoleInput.Split(' ');
-                    switch (inpurArray[0])
+                    var inputArray = consoleInput.Split(' ');
+                    switch (inputArray[0])
                     {
                         case "stop":
-                            {
-                                robot.StopImmediately();
-                                break;
-                            }
+                            _robot.StopImmediately();
+                            break;
+
                         case "enable":
-                            {
-                                robot.Enable();
-                                break;
-                            }
+                            _robot.Enable();
+                            break;
+
                         case "disable":
-                            {
-                                robot.Move(0);
-                                robot.Disable();
-                                break;
-                            }
+                            _robot.Move(0);
+                            _robot.Disable();
+                            break;
+
                         case "exit":
-                            {
-                                robot.Move(0);
-                                robot.Disable();
-                                consoleInput = "exit"; // not needed
-                                break;
-                            }
+                            _robot.Move(0);
+                            _robot.Disable();
+                            consoleInput = "exit"; // not needed
+                            break;
+
                         case "movecm":
+                            if (inputArray.Length > 1)
                             {
-                                if (inpurArray.Length > 1)
+                                if (int.TryParse(inputArray[1], out var j))
                                 {
-                                    if (Int32.TryParse(inpurArray[1], out int j))
-                                    {
-                                        robot.MoveInCm(j);
-                                    }
-                                    else
-                                    {
-                                        ConsoleFormatter.Warning("Parameter is not valid");
-                                    }
+                                    _robot.MoveInCm(j);
                                 }
                                 else
                                 {
-                                    ConsoleFormatter.Warning("Parameter expected");
+                                    ConsoleFormatter.Warning("Parameter is not valid");
                                 }
-
-                                break;
                             }
+                            else
+                            {
+                                ConsoleFormatter.Warning("Parameter expected");
+                            }
+                            break;
+
                         case "movev":
+                            if (inputArray.Length > 1)
                             {
-                                if (inpurArray.Length > 1)
+                                // if passed value is "1.5" the result will be j=1.5
+                                // if passed value is "1,5" the result will be j=15
+                                // because the system is written in english
+                                if (double.TryParse(inputArray[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var j))
                                 {
-                                    // if passed value is "1.5" the result will be j=1.5
-                                    // if passed value is "1,5" the result will be j=15
-                                    // because the system is written in english
-                                    if (Double.TryParse(inpurArray[1], NumberStyles.Number, CultureInfo.InvariantCulture, out double j))
-                                    {
-                                        robot.Move(j);
-                                    }
-                                    else
-                                    {
-                                        ConsoleFormatter.Warning("Parameter is not valid");
-                                    }
+                                    _robot.Move(j);
                                 }
                                 else
                                 {
-                                    ConsoleFormatter.Warning("Parameter expected");
+                                    ConsoleFormatter.Warning("Parameter is not valid");
                                 }
-
-                                break;
                             }
+                            else
+                            {
+                                ConsoleFormatter.Warning("Parameter expected");
+                            }
+                            break;
+
                         case "turndg":
+                            if (inputArray.Length > 1)
                             {
-                                if (inpurArray.Length > 1)
+                                if (int.TryParse(inputArray[1], out var j))
                                 {
-                                    if (Int32.TryParse(inpurArray[1], out int j))
-                                    {
-                                        robot.TurnInDegrees(j);
-                                    }
-                                    else
-                                    {
-                                        ConsoleFormatter.Warning("Parameter is not valid.");
-                                    }
+                                    _robot.TurnInDegrees(j);
                                 }
                                 else
                                 {
-                                    ConsoleFormatter.Warning("Parameter expected");
+                                    ConsoleFormatter.Warning("Parameter is not valid.");
                                 }
-
-                                break;
                             }
-                        case "keys":
+                            else
                             {
-                                ConsoleFormatter.Custom(ConsoleColor.DarkGreen,
-                                    "'arrow keys' - direct the robot",
-                                    "'space' - slow down robot",
-                                    "'D' - disable robot",
-                                    "'E' - enable robot",
-                                    "'X' - terminate keys");
-                                consoleInput = "";
-                                WalkMode lastWalkMode = robot.CurrentWalkMode;
-                                TurnMode lastTurnMode = robot.CurrentTurnMode;
-                                Console.Clear();
-                                CurrentMode(robot.CurrentWalkMode, robot.CurrentTurnMode);
-                                while (consoleInput == "")
-                                {
-                                    ConsoleKey c;
-
-                                    if (Console.KeyAvailable)
-                                    {
-                                        c = Console.ReadKey(true).Key;
-                                    }
-                                    else
-                                    {
-                                        c = ConsoleKey.Spacebar;
-                                    }
-                                    #region Keyswitch
-                                    switch (c)
-                                    {
-                                        case ConsoleKey.UpArrow:
-                                            ChangeWalkAndTurnMode(Direction.UP);
-                                            break;
-                                        case ConsoleKey.DownArrow:
-                                            ChangeWalkAndTurnMode(Direction.DOWN);
-                                            break;
-                                        case ConsoleKey.RightArrow:
-                                            ChangeWalkAndTurnMode(Direction.RIGHT);
-                                            break;
-                                        case ConsoleKey.LeftArrow:
-                                            ChangeWalkAndTurnMode(Direction.LEFT);
-                                            break;
-                                        case ConsoleKey.Enter:
-                                            robot.StopByMode();
-                                            break;
-                                        case ConsoleKey.D:
-                                            robot.Disable();
-                                            break;
-                                        case ConsoleKey.E:
-                                            robot.Enable();
-                                            break;
-                                        case ConsoleKey.X:
-                                            consoleInput = "exit";
-                                            ConsoleFormatter.Info("Terminated keys");
-                                            break;
-                                    }
-                                    #endregion
-
-                                    if (robot.CurrentWalkMode != lastWalkMode || robot.CurrentTurnMode != lastTurnMode)
-                                    {
-                                        lastWalkMode = robot.CurrentWalkMode;
-                                        lastTurnMode = robot.CurrentTurnMode;
-                                        Console.Clear();
-                                        CurrentMode(robot.CurrentWalkMode, robot.CurrentTurnMode);
-                                    }
-                                }
-
-                                consoleInput = "";
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                break;
+                                ConsoleFormatter.Warning("Parameter expected");
                             }
+                            break;
+
+                        case "keys":
+                            ConsoleFormatter.Custom(ConsoleColor.DarkGreen,
+                                "'arrow keys' - direct the robot",
+                                "'space' - slow down robot",
+                                "'D' - disable robot",
+                                "'E' - enable robot",
+                                "'X' - terminate keys");
+                            consoleInput = "";
+                            var lastWalkMode = _robot.CurrentWalkMode;
+                            var lastTurnMode = _robot.CurrentTurnMode;
+                            Console.Clear();
+                            CurrentMode(_robot.CurrentWalkMode, _robot.CurrentTurnMode);
+                            while (consoleInput == "")
+                            {
+                                var c = Console.KeyAvailable ? Console.ReadKey(true).Key : ConsoleKey.Spacebar;
+                                #region Keyswitch
+                                switch (c)
+                                {
+                                    case ConsoleKey.UpArrow:
+                                        ChangeWalkAndTurnMode(Direction.Up);
+                                        break;
+                                    case ConsoleKey.DownArrow:
+                                        ChangeWalkAndTurnMode(Direction.Down);
+                                        break;
+                                    case ConsoleKey.RightArrow:
+                                        ChangeWalkAndTurnMode(Direction.Right);
+                                        break;
+                                    case ConsoleKey.LeftArrow:
+                                        ChangeWalkAndTurnMode(Direction.Left);
+                                        break;
+                                    case ConsoleKey.Enter:
+                                        _robot.StopByMode();
+                                        break;
+                                    case ConsoleKey.D:
+                                        _robot.Disable();
+                                        break;
+                                    case ConsoleKey.E:
+                                        _robot.Enable();
+                                        break;
+                                    case ConsoleKey.X:
+                                        consoleInput = "exit";
+                                        ConsoleFormatter.Info("Terminated keys");
+                                        break;
+                                }
+                                #endregion
+
+                                if (_robot.CurrentWalkMode == lastWalkMode && _robot.CurrentTurnMode == lastTurnMode)
+                                    continue;
+
+                                lastWalkMode = _robot.CurrentWalkMode;
+                                lastTurnMode = _robot.CurrentTurnMode;
+                                Console.Clear();
+                                CurrentMode(_robot.CurrentWalkMode, _robot.CurrentTurnMode);
+                            }
+                            consoleInput = "";
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            break;
 
                         case "divide":
-                            {
-                                arm.Divide();
-                                break;
-                            }
+                            _arm.Divide();
+                            break;
+
                         case "join":
-                            {
-                                arm.Join();
-                                break;
-                            }
+                            _arm.Join();
+                            break;
 
                         case "up":
-                            {
-                                arm.Up();
-                                break;
-                            }
+                            _arm.Up();
+                            break;
 
                         case "down":
-                            {
-                                arm.Down();
-                                break;
-                            }
+                            _arm.Down();
+                            break;
+
                         case "task":
-                            {
-                                PracticalTask2b();
-                                break;
-                            }
+                            PracticalTask2B();
+                            break;
                     }
 
                     Console.Clear();
@@ -333,20 +317,20 @@ namespace HwrBerlin.HenryTasks
         }
 
         /// <summary>
-        /// handles state machines for WalkMode and TurnMode and calles moveByMode()
+        /// handles state machines for WalkMode and TurnMode and calls moveByMode()
         /// </summary>
         /// <param name="direction">specified by arrow key that was pressed</param>
         /// <returns>returns always true</returns>
         private bool ChangeWalkAndTurnMode(Direction direction)
         {
-            WalkMode currentWalkMode = robot.CurrentWalkMode;
-            TurnMode currentTurnMode = robot.CurrentTurnMode;
+            var currentWalkMode = _robot.CurrentWalkMode;
+            var currentTurnMode = _robot.CurrentTurnMode;
 
             switch (direction)
             {
-                //pressing up key switches from BACKWARDS to STOP to FORWARDS_SLOW to FORWARDS_MEDIUM to FORWARDS_FAST
+                //pressing up key switches from Backwards to STOP to FORWARDS_SLOW to FORWARDS_MEDIUM to FORWARDS_FAST
                 //once reached FORWARDS_FAST, pressing up key again will not have any effect
-                case Direction.UP:
+                case Direction.Up:
                     switch (currentWalkMode)
                     {
                         case WalkMode.BACKWARDS:
@@ -361,12 +345,16 @@ namespace HwrBerlin.HenryTasks
                         case WalkMode.FORWARDS_MEDIUM:
                             currentWalkMode = WalkMode.FORWARDS_FAST;
                             break;
+                        case WalkMode.FORWARDS_FAST:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                     break;
 
-                //pressing down key switches from FORWARDS_FAST to FORWARDS_MEDIUM to FORWARDS_SLOW to STOP to BACKWARDS
-                //once reached BACKWARDS, pressing down key again will not have any effect
-                case Direction.DOWN:
+                //pressing down key switches from FORWARDS_FAST to FORWARDS_MEDIUM to FORWARDS_SLOW to STOP to Backwards
+                //once reached Backwards, pressing down key again will not have any effect
+                case Direction.Down:
                     switch (currentWalkMode)
                     {
                         case WalkMode.FORWARDS_FAST:
@@ -381,12 +369,16 @@ namespace HwrBerlin.HenryTasks
                         case WalkMode.STOP:
                             currentWalkMode = WalkMode.BACKWARDS;
                             break;
+                        case WalkMode.BACKWARDS:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                     break;
 
                 //pressing left key switches from RIGHT_HARD to RIGHT_SMOOTH to STRAIGHT to LEFT_SMOOTH to LEFT_HARD
                 //once reached LEFT_HARD, pressing left key again will not have any effect
-                case Direction.LEFT:
+                case Direction.Left:
                     switch (currentTurnMode)
                     {
                         case TurnMode.RIGHT_HARD:
@@ -401,12 +393,16 @@ namespace HwrBerlin.HenryTasks
                         case TurnMode.LEFT_SMOOTH:
                             currentTurnMode = TurnMode.LEFT_HARD;
                             break;
+                        case TurnMode.LEFT_HARD:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                     break;
 
                 //pressing right key switches from LEFT_HARD to LEFT_SMOOTH to STRAIGHT to RIGHT_SMOOTH to RIGHT_HARD
                 //once reached RIGHT_HARD, pressing right key again will not have any effect
-                case Direction.RIGHT:
+                case Direction.Right:
                     switch (currentTurnMode)
                     {
                         case TurnMode.LEFT_HARD:
@@ -421,91 +417,88 @@ namespace HwrBerlin.HenryTasks
                         case TurnMode.RIGHT_SMOOTH:
                             currentTurnMode = TurnMode.RIGHT_HARD;
                             break;
+                        case TurnMode.RIGHT_HARD:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                     break;
-            }
 
-
-            if (currentWalkMode == WalkMode.BACKWARDS)
-            {
-                //WalkMode.BACKWARDS needs reverse lateral movement calculation
-                robot.MoveByMode(currentWalkMode, currentTurnMode, true);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
-            else
-            {
-                robot.MoveByMode(currentWalkMode, currentTurnMode, false);
-            }
-
+            
+            _robot.MoveByMode(currentWalkMode, currentTurnMode, currentWalkMode == WalkMode.BACKWARDS);
 
             return true;
         }
 
-        public void PracticalTask2a()
+        public void PracticalTask2A()
         {
             Console.Clear();
             Console.WriteLine("Roboter fährt zur Küche.");
-            robot.TurnInDegrees(-90);
-            robot.MoveInCm(200);
-            arm.Divide();
+            _robot.TurnInDegrees(-90);
+            _robot.MoveInCm(200);
+            _arm.Divide();
 
             Console.Clear();
             Console.WriteLine("Bitte halten Sie ein Glas Wasser in der Hand des Roboters und drücken ENTER, damit sich die Hand schließt.");
             Console.ReadLine();
             Console.Clear();
             Console.WriteLine("Schließe die Hand.");
-            arm.Join();
+            _arm.Join();
             Console.Clear();
             Console.WriteLine("Fahre zum Patienten");
-            robot.TurnInDegrees(-180);
-            robot.MoveInCm(200);
-            robot.TurnInDegrees(-90);
-            robot.MoveInCm(200);
+            _robot.TurnInDegrees(-180);
+            _robot.MoveInCm(200);
+            _robot.TurnInDegrees(-90);
+            _robot.MoveInCm(200);
 
             Console.Clear();
             Console.WriteLine("ENTER drücke, damit sich die Hand öffnet.");
             Console.ReadLine();
             Console.Clear();
             Console.WriteLine("Öffne Hand");
-            arm.Divide();
+            _arm.Divide();
             Console.Clear();
             Console.WriteLine("Fahre zurück zum Warteplatz.");
-            robot.TurnInDegrees(-180);
-            robot.MoveInCm(200);
-            robot.TurnInDegrees(-180);
+            _robot.TurnInDegrees(-180);
+            _robot.MoveInCm(200);
+            _robot.TurnInDegrees(-180);
         }
 
-        public void PracticalTask2b()
+        public void PracticalTask2B()
         {
             Console.Clear();
             Console.WriteLine("Roboter fährt zur Küche.");
-            robot.MoveInCm(100);
-            robot.TurnInDegrees(90);
-            robot.MoveInCm(200);
-            arm.Divide();
+            _robot.MoveInCm(100);
+            _robot.TurnInDegrees(90);
+            _robot.MoveInCm(200);
+            _arm.Divide();
 
             Console.Clear();
             Console.WriteLine("Bitte halten Sie ein Glas Wasser in der Hand des Roboters und drücken ENTER, damit sich die Hand schließt.");
             Console.ReadLine();
             Console.Clear();
             Console.WriteLine("Schließe die Hand.");
-            arm.Join();
+            _arm.Join();
             Console.Clear();
             Console.WriteLine("Fahre zum Patienten");
-            robot.TurnInDegrees(-180);
-            robot.MoveInCm(400);
+            _robot.TurnInDegrees(-180);
+            _robot.MoveInCm(400);
 
             Console.Clear();
             Console.WriteLine("ENTER drücke, damit sich die Hand öffnet.");
             Console.ReadLine();
             Console.Clear();
             Console.WriteLine("Öffne Hand");
-            arm.Divide();
+            _arm.Divide();
             Console.Clear();
             Console.WriteLine("Fahre zurück zum Warteplatz.");
-            robot.TurnInDegrees(180);
-            robot.MoveInCm(200);
-            robot.TurnInDegrees(-90);
-            robot.MoveInCm(-100);
+            _robot.TurnInDegrees(180);
+            _robot.MoveInCm(200);
+            _robot.TurnInDegrees(-90);
+            _robot.MoveInCm(-100);
         }
     }
 }

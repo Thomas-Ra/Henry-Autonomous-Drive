@@ -2,6 +2,7 @@
 
 namespace HwrBerlin.Bot.Scanner
 {
+    /// <inheritdoc />
     /// <summary>
     /// will be thrown if critical commands aren't activated
     /// </summary>

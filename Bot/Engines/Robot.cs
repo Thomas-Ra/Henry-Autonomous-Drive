@@ -34,17 +34,7 @@ namespace HwrBerlin.Bot.Engines
         /// <summary>
         /// Engine object is needed to use engine methods
         /// </summary>
-        private Engine engine;
-
-        /// <summary>
-        /// Walkmode object is needed to set speed and direction of movement
-        /// </summary>
-        private WalkMode currentWalkMode;
-
-        /// <summary>
-        /// TurnMode object is needed to set intensity of lateral movement
-        /// </summary>
-        private TurnMode currentTurnMode;
+        private readonly Engine _engine;
 
         /// <summary>
         /// constructor for robot;
@@ -52,26 +42,20 @@ namespace HwrBerlin.Bot.Engines
         /// </summary>
         public Robot()
         {
-            engine = new Engine(Engine.EngineType.ROBOT);
-            currentWalkMode = WalkMode.STOP;
-            currentTurnMode = TurnMode.STRAIGHT;
+            _engine = new Engine(Engine.EngineType.Robot);
+            CurrentWalkMode = WalkMode.STOP;
+            CurrentTurnMode = TurnMode.STRAIGHT;
         }
 
         /// <summary>
         /// CurrentWalkMode defines the walk mode the robot has
         /// </summary>
-        public WalkMode CurrentWalkMode
-        {
-            get { return currentWalkMode; }
-        }
+        public WalkMode CurrentWalkMode { get; private set; }
 
         /// <summary>
         /// CurrentTurnMode defines the turn mode the robot has
         /// </summary>
-        public TurnMode CurrentTurnMode
-        {
-            get { return currentTurnMode; }
-        }
+        public TurnMode CurrentTurnMode { get; private set; }
 
         /// <summary>
         /// uses method from engine object
@@ -79,7 +63,7 @@ namespace HwrBerlin.Bot.Engines
         /// <returns> <see cref="Engine.Enable()"/></returns>
         public bool Enable()
         {
-            return engine.Enable();
+            return _engine.Enable();
         }
 
         /// <summary>
@@ -88,7 +72,7 @@ namespace HwrBerlin.Bot.Engines
         /// <returns> <see cref="Engine.Disable()"/></returns>
         public void Disable()
         {
-            engine.Disable();
+            _engine.Disable();
         }
 
         /// <summary>
@@ -97,7 +81,7 @@ namespace HwrBerlin.Bot.Engines
         /// <returns> <see cref="Engine.StopImmediately()"/></returns>
         public void StopImmediately()
         {
-            engine.StopImmediately();
+            _engine.StopImmediately();
         }
 
         /// <summary>
@@ -107,9 +91,9 @@ namespace HwrBerlin.Bot.Engines
         /// <returns><see cref="Engine.MoveWithVelocity()"/></returns>
         public bool Move(double velocity)
         {
-            Int32 vel = (int)Math.Round((velocity * 1000000), 0);
+            var vel = (int)Math.Round((velocity * 1000000), 0);
 
-            return engine.MoveWithVelocity(vel, vel);
+            return _engine.MoveWithVelocity(vel, vel);
         }
 
         /// <summary>
@@ -120,10 +104,10 @@ namespace HwrBerlin.Bot.Engines
         /// <returns><see cref="Engine.MoveWithVelocity()"/></returns>
         public bool Move(double velocity1, double velocity2)
         {
-            Int32 vel1 = (int)Math.Round((velocity1 * 1000000), 0);
-            Int32 vel2 = (int)Math.Round((velocity2 * 1000000), 0);
+            var vel1 = (int)Math.Round((velocity1 * 1000000), 0);
+            var vel2 = (int)Math.Round((velocity2 * 1000000), 0);
 
-            return engine.MoveWithVelocity(vel1, vel2);
+            return _engine.MoveWithVelocity(vel1, vel2);
         }
 
         /// <summary>
@@ -132,10 +116,10 @@ namespace HwrBerlin.Bot.Engines
         /// <param name="distance">distance in cm for wheels</param>
         public void MoveInCm(int distance)
         {
-            engine.MoveToPosition(distance * -2000);
+            _engine.MoveToPosition(distance * -2000);
 
             //robot should move until at least one motor has a negative MovementState
-            while (!engine.MovementState1 || !engine.MovementState2) { }
+            while (!_engine.MovementState1 || !_engine.MovementState2) { }
         }
 
 
@@ -147,10 +131,10 @@ namespace HwrBerlin.Bot.Engines
         public void TurnInDegrees(int degree)
         {
             //both wheels turn, one forwards, one backwards
-            engine.MoveToPosition(degree * 700, degree * -700);
+            _engine.MoveToPosition(degree * 700, degree * -700);
 
             //robot should move until at least one motor has a negative MovementState
-            while (!engine.MovementState1 || !engine.MovementState2) { }
+            while (!_engine.MovementState1 || !_engine.MovementState2) { }
         }
 
 
@@ -176,8 +160,8 @@ namespace HwrBerlin.Bot.Engines
         /// <returns>returns always true</returns>
         public bool MoveByMode(WalkMode walkMode, TurnMode turnMode, bool reverseMode = false)
         {
-            currentWalkMode = walkMode;
-            currentTurnMode = turnMode;
+            CurrentWalkMode = walkMode;
+            CurrentTurnMode = turnMode;
 
             //velocity for left wheel
             double vel1 = (int)walkMode;

@@ -5,71 +5,68 @@ using System.Collections.Generic;
 
 namespace HwrBerlin.HenryAutoDrive
 {
-    class Program
+    internal class Program
     {
-        static Robot robot;
-        static Scanner scanner;
-        static Random rnd;
+        private static Robot _robot;
+        private static Scanner _scanner;
+        private static Random _rnd;
 
-        static void Main(string[] args)
+        private static void Main()
         {
-            robot = new Robot();
-            scanner = new Scanner();
-            rnd = new Random();
+            _robot = new Robot();
+            _scanner = new Scanner();
+            _rnd = new Random();
+
+            AutoDrive();
         }
 
-        static void AutoDrive()
+        private static void AutoDrive()
         {
             //distances that cause an immediate stop
             //TODO: List has to be filled with concrete values, 49 is just for testing & lower than turnDistances
-            List<int> stopDistances = new List<int>();
-            for (int i = 0; i < 181; i++)
-            {
+            var stopDistances = new List<int>();
+            for (var i = 0; i < 181; i++)
                 stopDistances.Add(300);
-            }
+
             //distances that cause a turn
             //TODO: List has to be filled with concrete values, 50 is just for testing
-            List<int> turnDistances = new List<int>();
-            for (int i = 0; i < 181; i++)
-            {
+            var turnDistances = new List<int>();
+            for (var i = 0; i < 181; i++)
                 turnDistances.Add(500);
-            }
-            List<int> scanData = new List<int>();
-            scanData = scanner.MedianFilter(scanner.GetDataList());
+
+            var scanData = _scanner.MedianFilter(_scanner.GetDataList());
             //as long as stop distances are not reached and no stop key is pressed
             while ((!CompareList(scanData, stopDistances)) || !Console.KeyAvailable)
             {
                 //as long as there are no turn distances reached
                 while (!CompareList(scanData, turnDistances))
                 {
-                    robot.Move(1);
-                    scanData = scanner.GetDataList();
+                    _robot.Move(1);
+                    scanData = _scanner.GetDataList();
+                }
 
-                }
-                if (CompareList(scanData, turnDistances))
-                {
-                    robot.Move(0);
-                    int degrees = rnd.Next(10, 90);
-                    int sign = rnd.Next(0, 1);
-                    if (sign == 1)
-                    {
-                        degrees = degrees * (-1);
-                    }
-                    robot.TurnInDegrees(degrees);
-                    scanData = scanner.GetDataList();
-                }
+                if (!CompareList(scanData, turnDistances))
+                    continue;
+
+                _robot.Move(0);
+                var degrees = _rnd.Next(10, 90);
+                var sign = _rnd.Next(0, 1);
+                if (sign == 1)
+                    degrees = degrees * (-1);
+                _robot.TurnInDegrees(degrees);
+                scanData = _scanner.GetDataList();
             }
         }
 
-        static bool CompareList(List<int> first, List<int> second)
+        private static bool CompareList(IEnumerable<int> first, IReadOnlyList<int> second)
         {
             //which element do we look at
-            int i = 0;
+            var i = 0;
             //how many problems are detected in comparison, there are unwanted peaks that are not detected by the median filter
-            int count = 0;
-            bool result = false;
+            var count = 0;
+            var result = false;
             //loop through lists and compare if there are problems
-            foreach (int data in first)
+            foreach (var data in first)
             {
                 if (!(data >= second[i]))
                 {

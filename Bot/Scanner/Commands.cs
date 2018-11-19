@@ -44,22 +44,22 @@ namespace HwrBerlin.Bot.Scanner
         /// <returns>the description</returns>
         private static string GetDescription<T>(this T enumerationValue) where T : struct
         {
-            Type type = enumerationValue.GetType();
-            MemberInfo[] memberInfo = type.GetMember(enumerationValue.ToString());
-            object[] attrs = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+            var type = enumerationValue.GetType();
+            var memberInfo = type.GetMember(enumerationValue.ToString());
+            var attrs = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
             return ((DescriptionAttribute)attrs[0]).Description;
         }
 
 
 
-        private static bool CriticalCommands = false;
+        private static bool _criticalCommands = false;
 
         /// <summary>
         /// activates to receive critical commands
         /// </summary>
         public static void ActivateCriticalCommands()
         {
-            CriticalCommands = true;
+            _criticalCommands = true;
         }
 
 
@@ -72,8 +72,8 @@ namespace HwrBerlin.Bot.Scanner
         {
             byte[] msgBegin = { 0x02 };
             byte[] msgEnd = { 0x03 };
-            byte[] msg = Encoding.ASCII.GetBytes(input);
-            byte[] fullRequest = new byte[msgBegin.Length + msg.Length + msgEnd.Length];
+            var msg = Encoding.ASCII.GetBytes(input);
+            var fullRequest = new byte[msgBegin.Length + msg.Length + msgEnd.Length];
             Buffer.BlockCopy(msgBegin, 0, fullRequest, 0, msgBegin.Length);
             Buffer.BlockCopy(msg, 0, fullRequest, msgBegin.Length, msg.Length);
             Buffer.BlockCopy(msgEnd, 0, fullRequest, msgBegin.Length + msg.Length, msgEnd.Length);
@@ -113,7 +113,7 @@ namespace HwrBerlin.Bot.Scanner
         // page 40
         private static string LoadFactoryDefaults()
         {
-            if (CriticalCommands)
+            if (_criticalCommands)
             {
                 return "sMN mSCloadfacdef";
             }
@@ -128,7 +128,7 @@ namespace HwrBerlin.Bot.Scanner
         // page 41
         private static string LoadApplicationDefaults()
         {
-            if (CriticalCommands)
+            if (_criticalCommands)
             {
                 return "mSCloadappdef";
             }
@@ -163,7 +163,7 @@ namespace HwrBerlin.Bot.Scanner
         }
 
         // page 55
-        public static string ConfigureDataContent(bool remission, BitResolution resolution, bool position, bool deviceName, bool comment, bool time, UInt16 scanRate)
+        public static string ConfigureDataContent(bool remission, BitResolution resolution, bool position, bool deviceName, bool comment, bool time, ushort scanRate)
         {
             return "sWN LMDscandatacfg"
                 + " " + "01 00"

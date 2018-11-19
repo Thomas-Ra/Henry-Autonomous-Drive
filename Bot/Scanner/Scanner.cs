@@ -13,20 +13,11 @@ namespace HwrBerlin.Bot.Scanner
     /// </summary>
     public class Scanner
     {
-        /// <summary>
-        /// the ip adress of the laser scanner
-        /// </summary>
-        private readonly string Ip;
-
-        /// <summary>
-        /// the port to communicate with the laser scanner
-        /// </summary>
-        private readonly int Port;
         
-        private Socket Socket;
-        private NetworkStream NetworkStream;
-        private BinaryReader BinaryReader;
-        private BinaryWriter BinaryWriter;
+        private readonly Socket _socket;
+        private readonly NetworkStream _networkStream;
+        private readonly BinaryReader _binaryReader;
+        private readonly BinaryWriter _binaryWriter;
         
         /// <summary>
         /// initialize the connection to the laser scanner
@@ -35,28 +26,24 @@ namespace HwrBerlin.Bot.Scanner
         /// <param name="port">default is 2111</param>
         public Scanner(string ip = "192.168.0.1", int port = 2111)
         {
-            Ip = ip;
-            Port = port;
-
-
-            IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(Ip), Port);
-            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            var ipEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
-                Socket.Connect(ipEndPoint);
+                _socket.Connect(ipEndPoint);
 
                 //get the stream to the server
-                NetworkStream = new NetworkStream(Socket);
+                _networkStream = new NetworkStream(_socket);
 
                 //when sending and receiving bytes, a BinaryWriter/BinaryReader can be used
-                BinaryWriter = new BinaryWriter(NetworkStream);
-                BinaryReader = new BinaryReader(NetworkStream);
+                _binaryWriter = new BinaryWriter(_networkStream);
+                _binaryReader = new BinaryReader(_networkStream);
 
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
-                ConsoleFormatter.Error("Failed to connect to server at IP " + Ip + ":" + Port);
-                throw e;
+                ConsoleFormatter.Error("Failed to connect to server at IP " + ip + ":" + port);
+                throw;
             }
         }
 
@@ -65,12 +52,12 @@ namespace HwrBerlin.Bot.Scanner
         /// </summary>
         ~Scanner()
         {
-            BinaryReader.Close();
-            BinaryWriter.Close();
-            NetworkStream.Close();
+            _binaryReader.Close();
+            _binaryWriter.Close();
+            _networkStream.Close();
 
-            Socket.Shutdown(SocketShutdown.Both);
-            Socket.Close();
+            _socket.Shutdown(SocketShutdown.Both);
+            _socket.Close();
         }
 
         /// <summary>
@@ -81,18 +68,15 @@ namespace HwrBerlin.Bot.Scanner
         public byte[] SendAndReceiveData(byte[] message)
         {
             //send the message
-            BinaryWriter.Write(message, 0, message.Length);
-            BinaryWriter.Flush();
+            _binaryWriter.Write(message, 0, message.Length);
+            _binaryWriter.Flush();
 
             //create buffer for the servers answer and read the answer
-            byte[] dataReceived = new Byte[2048];
-            BinaryReader.Read(dataReceived, 0, dataReceived.Length);
+            var dataReceived = new byte[2048];
+            _binaryReader.Read(dataReceived, 0, dataReceived.Length);
 
             //delete all values that are null and the begin and the end
-            return dataReceived.Where(
-                (val) => {
-                    return val != 0 && val != 2 && val != 3;
-                }).ToArray();
+            return dataReceived.Where((val) => val != 0 && val != 2 && val != 3).ToArray();
         }
 
         /// <summary>
@@ -101,18 +85,18 @@ namespace HwrBerlin.Bot.Scanner
         /// <returns>list with the distance in mm</returns>
         public List<int> GetDataList()
         {
-            byte[] message = Commands.GenerateMessage(Commands.PollOneTelegram());
+            var message = Commands.GenerateMessage(Commands.PollOneTelegram());
 
             //receive scanData
-            byte[] data = SendAndReceiveData(message);
+            var data = SendAndReceiveData(message);
 
-            string[] values = Encoding.ASCII.GetString(data).Split(new string[] { " " }, StringSplitOptions.None);
+            var values = Encoding.ASCII.GetString(data).Split(new[] { " " }, StringSplitOptions.None);
 
-            int amountOfData = int.Parse(values[25], System.Globalization.NumberStyles.HexNumber);
+            var amountOfData = int.Parse(values[25], System.Globalization.NumberStyles.HexNumber);
 
             //convert hex numbers to int numbers that represent the measured distances
-            List<int> distanceData = new List<int>();
-            for (int i = 25 + amountOfData; i > 25; i--)
+            var distanceData = new List<int>();
+            for (var i = 25 + amountOfData; i > 25; i--)
             {
                 distanceData.Add(int.Parse(values[i], System.Globalization.NumberStyles.HexNumber));
             }
@@ -128,16 +112,15 @@ namespace HwrBerlin.Bot.Scanner
         public List<int> MedianFilter(List<int> scanData)
         {
             //how many numbers should be compared in each direction
-            int width = 6;
-            //index of median valuie
-            int middle = 0;
+            const int width = 6;
+            //index of median value
 
             //loop through every item of scan data list
-            for (int i = 0; i < scanData.Count; i++)
+            for (var i = 0; i < scanData.Count; i++)
             {
                 //new list for comparison of items
-                List<int> comparison = new List<int>();
-                for (int l = 0; l <= width; l++)
+                var comparison = new List<int>();
+                for (var l = 0; l <= width; l++)
                 {
                     //add items in increasing direction
                     if (i + l < scanData.Count)
@@ -152,7 +135,7 @@ namespace HwrBerlin.Bot.Scanner
                     //sort comparison list
                     comparison.Sort();
                     //find index of median value
-                    middle = comparison.Count / 2;
+                    var middle = comparison.Count / 2;
                     //replace item with new median value
                     scanData[i] = comparison[middle];
                 }
