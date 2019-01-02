@@ -23,6 +23,11 @@ namespace HwrBerlin.HenryAutoDrive
                 Console.ReadLine();
         }
 
+        private static List<int> ReduceDataList(List<int> data, int amount)
+        {
+            return amount > data.Count ? data : data.GetRange((data.Count - amount) / 2 - 1, amount);
+        }
+
         private static void AutoDrive()
         {
             //distances that cause an immediate stop
@@ -37,7 +42,7 @@ namespace HwrBerlin.HenryAutoDrive
             for (var i = 0; i < 181; i++)
                 turnDistances.Add(500);
 
-            var scanData = _scanner.MedianFilter(_scanner.GetDataList());
+            var scanData = _scanner.MedianFilter(ReduceDataList(_scanner.GetDataList(), 181));
             //as long as stop distances are not reached and no stop key is pressed
             while ((!CompareList(scanData, stopDistances)) || !Console.KeyAvailable)
             {
@@ -45,7 +50,7 @@ namespace HwrBerlin.HenryAutoDrive
                 while (!CompareList(scanData, turnDistances))
                 {
                     _robot.Move(1);
-                    scanData = _scanner.GetDataList();
+                    scanData = ReduceDataList(_scanner.GetDataList(), 181);
                 }
 
                 if (!CompareList(scanData, turnDistances))
@@ -57,7 +62,7 @@ namespace HwrBerlin.HenryAutoDrive
                 if (sign == 1)
                     degrees = degrees * (-1);
                 _robot.TurnInDegrees(degrees);
-                scanData = _scanner.GetDataList();
+                scanData = ReduceDataList(_scanner.GetDataList(), 181);
             }
         }
 
@@ -72,16 +77,12 @@ namespace HwrBerlin.HenryAutoDrive
             foreach (var data in first)
             {
                 if (!(data >= second[i]))
-                {
                     count++;
-                }
                 i++;
             }
             //if there are more problems than expected from measure failures than set result to "problem" (true)
             if (count >= 10)
-            {
                 result = true;
-            }
             Console.WriteLine(count);
             return result;
         }
