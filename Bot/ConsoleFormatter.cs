@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace HwrBerlin.Bot
 {
@@ -16,9 +17,7 @@ namespace HwrBerlin.Bot
             var currentColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.White;
             foreach (var s in msg)
-            {
                 Console.WriteLine(s);
-            }
             Console.ForegroundColor = currentColor;
         }
 
@@ -32,9 +31,7 @@ namespace HwrBerlin.Bot
             var currentColor = Console.ForegroundColor;
             Console.ForegroundColor = color;
             foreach (var s in msg)
-            {
                 Console.WriteLine(s);
-            }
             Console.ForegroundColor = currentColor;
         }
 
@@ -46,12 +43,7 @@ namespace HwrBerlin.Bot
         {
             var currentColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("*");
-            foreach (var s in msg)
-            {
-                Console.WriteLine("* " + s);
-            }
-            Console.WriteLine("*");
+            WriteInBox(msg);
             Console.ForegroundColor = currentColor;
         }
 
@@ -63,12 +55,7 @@ namespace HwrBerlin.Bot
         {
             var currentColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("*");
-            foreach (var s in msg)
-            {
-                Console.WriteLine("* " + s);
-            }
-            Console.WriteLine("*");
+            WriteInBox(msg);
             Console.ForegroundColor = currentColor;
         }
 
@@ -80,13 +67,22 @@ namespace HwrBerlin.Bot
         {
             var currentColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("*");
-            foreach (var s in msg)
-            {
-                Console.WriteLine("* " + s);
-            }
-            Console.WriteLine("*");
+            WriteInBox(msg);
             Console.ForegroundColor = currentColor;
+        }
+
+        /// <summary>
+        /// writes text in a box of stars
+        /// </summary>
+        /// <param name="msg">text lines</param>
+        private static void WriteInBox(params string[] msg)
+        {
+            var width = msg.Select(s => s.Length).Concat(new[] {0}).Max();
+            var line = new string('*', width + 4);
+            Console.WriteLine(line);
+            foreach (var s in msg)
+                Console.WriteLine("* " + s + new string(' ', width - s.Length) + " *");
+            Console.WriteLine(line);
         }
     }
 }

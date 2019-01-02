@@ -177,7 +177,9 @@ namespace HwrBerlin.Bot.Engines
             //an error may occur
             catch (Exception)
             {
-                ConsoleFormatter.Error("Failed to connect to the engine.", "Type: " + engineType);
+                ConsoleFormatter.Error("Failed to connect to the engine.",
+                                       "Type: " + engineType,
+                                       "Help: Check if the cable is plugged in properly.");
                 throw;
             }
         }

@@ -20,8 +20,8 @@ namespace HwrBerlin.HenryTasks
         }
 
 
-        private readonly Robot _robot = new Robot();
-        private readonly Arm _arm = new Arm();
+        private readonly Robot _robot = Initialize();
+        private readonly Arm _arm = Arm.Initialize();
 
         private static void Main()
         {
@@ -127,7 +127,7 @@ namespace HwrBerlin.HenryTasks
 
         public void Start()
         {
-            if (_robot.Enable())
+            if (_robot != null && _robot.Enable())
             {
                 var consoleInput = "";
 

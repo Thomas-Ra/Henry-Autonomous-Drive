@@ -13,11 +13,14 @@ namespace HwrBerlin.HenryAutoDrive
 
         private static void Main()
         {
-            _robot = new Robot();
-            _scanner = new Scanner();
+            _robot = Robot.Initialize();
+            _scanner = Scanner.Initialize();
             _rnd = new Random();
 
-            AutoDrive();
+            if (_robot != null && _scanner != null)
+                AutoDrive();
+            else
+                Console.ReadLine();
         }
 
         private static void AutoDrive()

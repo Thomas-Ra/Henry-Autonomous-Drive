@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Reflection;
 using System.Text;
 
 namespace HwrBerlin.Bot.Scanner
@@ -117,10 +116,8 @@ namespace HwrBerlin.Bot.Scanner
             {
                 return "sMN mSCloadfacdef";
             }
-            else
-            {
-                throw new CriticalCommandsNotActivated();
-            }
+
+            throw new CriticalCommandsNotActivated();
         }
 
         // be careful, deletes user settings (but keeps field and evaluation settings)
@@ -132,10 +129,8 @@ namespace HwrBerlin.Bot.Scanner
             {
                 return "mSCloadappdef";
             }
-            else
-            {
-                throw new CriticalCommandsNotActivated();
-            }
+
+            throw new CriticalCommandsNotActivated();
         }
 
         // page 45
@@ -301,10 +296,8 @@ namespace HwrBerlin.Bot.Scanner
                     + " +" + (deviceName.Length).ToString()
                     + " " + deviceName;
             }
-            else
-            {
-                throw new DeviceNameTooLong();
-            }
+
+            throw new DeviceNameTooLong();
         }
 
         // page 153

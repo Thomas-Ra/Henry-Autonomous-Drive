@@ -22,9 +22,9 @@ namespace HwrBerlin.Bot.Scanner
         /// <summary>
         /// initialize the connection to the laser scanner
         /// </summary>
-        /// <param name="ip">default is 192.168.0.1</param>
-        /// <param name="port">default is 2111</param>
-        public Scanner(string ip = "192.168.0.1", int port = 2111)
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        private Scanner(string ip, int port)
         {
             var ipEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -42,8 +42,31 @@ namespace HwrBerlin.Bot.Scanner
             }
             catch (SocketException)
             {
-                ConsoleFormatter.Error("Failed to connect to server at IP " + ip + ":" + port);
+                ConsoleFormatter.Error("Failed to connect to laser scanner at " + ip + ":" + port, 
+                                       "Help: Check if the cable is plugged in properly and the right network settings are set.");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// creates an object for the robot which provides a connection
+        /// </summary>
+        /// <param name="ip">default is 192.168.0.1</param>
+        /// <param name="port">default is 2111</param>
+        /// <param name="throwExceptions">can optional redirect the thrown exceptions</param>
+        /// <returns>the initialized robot object if it was successful</returns>
+        public static Scanner Initialize(string ip = "192.168.0.1", int port = 2111, bool throwExceptions = false)
+        {
+            try
+            {
+                return new Scanner(ip, port);
+            }
+            catch (Exception)
+            {
+                if (throwExceptions)
+                    throw;
+
+                return null;
             }
         }
 

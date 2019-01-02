@@ -52,7 +52,7 @@ namespace HwrBerlin.Bot.Engines
         /// creates engine object, gets Arm- und HandPosition
         /// </summary>
         /// <exception cref="Exception">thrown, when connection to arm fails</exception>
-        public Arm()
+        private Arm()
         {
             //connect to engine of type ARM
             _engine = new Engine(Engine.EngineType.Arm);
@@ -62,6 +62,26 @@ namespace HwrBerlin.Bot.Engines
 
             //position of hand must be known before moving the first time
             GetHandPositionFromFile();
+        }
+
+        /// <summary>
+        /// creates an object for the arm which provides a connection
+        /// </summary>
+        /// <param name="throwExceptions">can optional redirect the thrown exceptions</param>
+        /// <returns>the initialized arm object if it was successful</returns>
+        public static Arm Initialize(bool throwExceptions = false)
+        {
+            try
+            {
+                return new Arm();
+            }
+            catch (Exception)
+            {
+                if (throwExceptions)
+                    throw;
+
+                return null;
+            }
         }
 
         /// <summary>
