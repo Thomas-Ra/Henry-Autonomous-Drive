@@ -2,7 +2,6 @@
 using HwrBerlin.Bot.Scanner;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace HwrBerlin.HenryAutoDrive

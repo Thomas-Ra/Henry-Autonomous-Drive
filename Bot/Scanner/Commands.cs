@@ -9,6 +9,9 @@ namespace HwrBerlin.Bot.Scanner
     /// </summary>
     public static class Commands
     {
+        /// <summary>
+        /// the possible bit resolutions defined in the documentation
+        /// </summary>
         public enum BitResolution
         {
             [Description("0")]
@@ -17,6 +20,9 @@ namespace HwrBerlin.Bot.Scanner
             Bit16
         }
 
+        /// <summary>
+        /// the possible angular resolutions defined in the documentation
+        /// </summary>
         public enum AngularResolution
         {
             [Description("D05")]
@@ -25,6 +31,9 @@ namespace HwrBerlin.Bot.Scanner
             OneDegree
         }
 
+        /// <summary>
+        /// the possible interfaces defined in the documentation
+        /// </summary>
         public enum InterfaceType
         {
             [Description("0")]

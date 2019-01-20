@@ -144,7 +144,7 @@ namespace HwrBerlin.Bot.Engines
         /// <summary>
         /// moves grappers of hand away from each other until enter is pressed or limit is reached
         /// </summary>
-        /// <returns>bool that indicates, if operation was successfull</returns>
+        /// <returns>bool that indicates, if operation was successful</returns>
         public bool Divide()
         {
             //if hand is not at limit and is able to divide
@@ -189,14 +189,14 @@ namespace HwrBerlin.Bot.Engines
                 //hand position is open
                 HandPosition = HandPos.Open;
 
-            //divide() returns true if divide() was successfull
+            //divide() returns true if divide() was successful
             return true;
         }
 
         /// <summary>
         /// moves grappers of hand towards each other until enter is pressed or limit is reached
         /// </summary>
-        /// <returns>bool that indicates, if operation was successfull</returns>
+        /// <returns>bool that indicates, if operation was successful</returns>
         public bool Join()
         {
             //if hand is not at limit and is able to divide
@@ -238,7 +238,7 @@ namespace HwrBerlin.Bot.Engines
                 //hand position is closed
                 HandPosition = HandPos.Closed;
 
-            //join() returns true if join() was successfull
+            //join() returns true if join() was successful
             return true;
         }
 
@@ -247,7 +247,7 @@ namespace HwrBerlin.Bot.Engines
         /// <summary>
         /// moves arm upwards until enter is pressed or limit is reached
         /// </summary>
-        /// <returns>bool that indicates, if operation was successfull</returns>
+        /// <returns>bool that indicates, if operation was successful</returns>
         public bool Up()
         {
             //if arm is not at limit and is able to raise
@@ -289,14 +289,14 @@ namespace HwrBerlin.Bot.Engines
                 //arm position is top
                 ArmPosition = ArmPos.Top;
             
-            //join() returns true if join() was successfull
+            //join() returns true if join() was successful
             return true;
         }
 
         /// <summary>
         /// moves arm downwards until enter is pressed or limit is reached
         /// </summary>
-        /// <returns>bool that indicates, if operation was successfull</returns>
+        /// <returns>bool that indicates, if operation was successful</returns>
         public bool Down()
         {
             //if arm is not at limit and is able to descent
@@ -338,7 +338,7 @@ namespace HwrBerlin.Bot.Engines
                 //arm position is bottom
                 ArmPosition = ArmPos.Bottom;
             
-            //join() returns true if join() was successfull
+            //join() returns true if join() was successful
             return true;
         }
     }
