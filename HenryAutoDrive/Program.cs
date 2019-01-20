@@ -2,6 +2,8 @@
 using HwrBerlin.Bot.Scanner;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace HwrBerlin.HenryAutoDrive
 {
@@ -9,82 +11,230 @@ namespace HwrBerlin.HenryAutoDrive
     {
         private static Robot _robot;
         private static Scanner _scanner;
-        private static Random _rnd;
+
+        private static int _problemSide;
+        private static int _problemSideRange;
+        private static int _maxProblems;
 
         private static void Main()
         {
-            _robot = Robot.Initialize();
-            _scanner = Scanner.Initialize();
-            _rnd = new Random();
+            _robot = new Robot();
+            _scanner = new Scanner();
 
             if (_robot != null && _scanner != null)
                 AutoDrive();
+                //FollowTheWall();
             else
                 Console.ReadLine();
-        }
-
-        private static List<int> ReduceDataList(List<int> data, int amount)
-        {
-            return amount > data.Count ? data : data.GetRange((data.Count - amount) / 2 - 1, amount);
         }
 
         private static void AutoDrive()
         {
             //distances that cause an immediate stop
-            //TODO: List has to be filled with concrete values, 49 is just for testing & lower than turnDistances
             var stopDistances = new List<int>();
-            for (var i = 0; i < 181; i++)
+            for (var i = 0; i < 39; i++)
+                stopDistances.Add(0);
+            for (var i = 0; i < 193; i++)
                 stopDistances.Add(300);
-
+            for (var i = 0; i < 39; i++)
+                stopDistances.Add(0);
             //distances that cause a turn
-            //TODO: List has to be filled with concrete values, 50 is just for testing
             var turnDistances = new List<int>();
-            for (var i = 0; i < 181; i++)
+            for (var i = 0; i < 39; i++)
+                turnDistances.Add(0);
+            for (var i = 0; i < 193; i++)
                 turnDistances.Add(500);
+            for (var i = 0; i < 39; i++)
+                turnDistances.Add(0);
+            //distances free for random left
+            var freeDistancesLeft = new List<int>();
+            for (var i = 0; i < 39; i++)
+                freeDistancesLeft.Add(0);
+            for (var i = 0; i < 97; i++)
+                freeDistancesLeft.Add(550);
+            for (var i = 0; i < 96; i++)
+                freeDistancesLeft.Add(500);
+            for (var i = 0; i < 39; i++)
+                freeDistancesLeft.Add(0);
+            //distances free for random right
+            var freeDistancesRight = new List<int>();
+            for (var i = 0; i < 39; i++)
+                freeDistancesRight.Add(0);
+            for (var i = 0; i < 96; i++)
+                freeDistancesRight.Add(500);
+            for (var i = 0; i < 97; i++)
+                freeDistancesRight.Add(550);
+            for (var i = 0; i < 39; i++)
+                freeDistancesRight.Add(0);
 
-            var scanData = _scanner.MedianFilter(ReduceDataList(_scanner.GetDataList(), 181));
-            //as long as stop distances are not reached and no stop key is pressed
-            while ((!CompareList(scanData, stopDistances)) || !Console.KeyAvailable)
+            _problemSide = 0;
+            _problemSideRange = 15000;
+            _maxProblems = 10;
+
+            while (!Console.KeyAvailable)
             {
-                //as long as there are no turn distances reached
-                while (!CompareList(scanData, turnDistances))
+                var sensorData = _scanner.MedianFilter(_scanner.GetDataList());
+
+                var currentWalkMode = Robot.WalkMode.FORWARDS_SLOW;
+                var currentTurnMode = Robot.TurnMode.STRAIGHT;
+
+                //if stop distances reached drive backwards
+                if (CompareList(sensorData, stopDistances))
                 {
-                    _robot.Move(1);
-                    scanData = ReduceDataList(_scanner.GetDataList(), 181);
+                    currentWalkMode = Robot.WalkMode.BACKWARDS;
+                }
+                else
+                {
+                    //if turn distances not reached drive forwards
+                    if (!CompareList(sensorData, turnDistances))
+                    {
+                        if (!CompareList(sensorData, freeDistancesLeft) || !CompareList(sensorData, freeDistancesRight))
+                        {
+                            currentTurnMode = sensorData.GetRange(45, 90).Average() > sensorData.GetRange(136, 90).Average() ? Robot.TurnMode.LEFT_SMOOTH : Robot.TurnMode.RIGHT_SMOOTH;
+                        }
+                    }
+                    else
+                    {
+                        currentWalkMode = Robot.WalkMode.STOP;
+                        //if there are more problems on the one side turn to the other side
+                        currentTurnMode = _problemSide < 0 ? Robot.TurnMode.RIGHT_SMOOTH : Robot.TurnMode.LEFT_SMOOTH;
+                    }
                 }
 
-                if (!CompareList(scanData, turnDistances))
-                    continue;
-
-                _robot.Move(0);
-                var degrees = _rnd.Next(10, 90);
-                var sign = _rnd.Next(0, 1);
-                if (sign == 1)
-                    degrees = degrees * (-1);
-                _robot.TurnInDegrees(degrees);
-                scanData = ReduceDataList(_scanner.GetDataList(), 181);
+                if (_robot.CurrentWalkMode != currentWalkMode || _robot.CurrentTurnMode != currentTurnMode)
+                    _robot.MoveByMode(currentWalkMode, currentTurnMode);
             }
         }
 
-        private static bool CompareList(IEnumerable<int> first, IReadOnlyList<int> second)
+        private static void FollowTheWall()
         {
-            //which element do we look at
-            var i = 0;
-            //how many problems are detected in comparison, there are unwanted peaks that are not detected by the median filter
-            var count = 0;
-            var result = false;
-            //loop through lists and compare if there are problems
-            foreach (var data in first)
+            var stopDistances = new List<int>();
+            for (var i = 0; i < 39; i++)
+                stopDistances.Add(0);
+            for (var i = 0; i < 193; i++)
+                stopDistances.Add(300);
+            for (var i = 0; i < 39; i++)
+                stopDistances.Add(0);
+            //distances that cause a turn
+            var turnDistances = new List<int>();
+            for (var i = 0; i < 39; i++)
+                turnDistances.Add(0);
+            for (var i = 0; i < 193; i++)
+                turnDistances.Add(500);
+            for (var i = 0; i < 39; i++)
+                turnDistances.Add(0);
+            //distances free for random left
+            var freeDistancesLeft = new List<int>();
+            for (var i = 0; i < 39; i++)
+                freeDistancesLeft.Add(0);
+            for (var i = 0; i < 97; i++)
+                freeDistancesLeft.Add(550);
+            for (var i = 0; i < 96; i++)
+                freeDistancesLeft.Add(500);
+            for (var i = 0; i < 39; i++)
+                freeDistancesLeft.Add(0);
+            //distances free for random right
+            var freeDistancesRight = new List<int>();
+            for (var i = 0; i < 39; i++)
+                freeDistancesRight.Add(0);
+            for (var i = 0; i < 96; i++)
+                freeDistancesRight.Add(500);
+            for (var i = 0; i < 97; i++)
+                freeDistancesRight.Add(550);
+            for (var i = 0; i < 39; i++)
+                freeDistancesRight.Add(0);
+
+            _problemSide = 0;
+            _problemSideRange = 5000;
+            _maxProblems = 5;
+
+            var wallLeft = false;
+
+            while (!Console.KeyAvailable)
             {
-                if (!(data >= second[i]))
-                    count++;
-                i++;
+                var currentWalkMode = Robot.WalkMode.FORWARDS_SLOW;
+                var currentTurnMode = Robot.TurnMode.STRAIGHT;
+
+                var sensorData = _scanner.MedianFilter(_scanner.GetDataList());
+
+                //if stop distances reached drive backwards
+                if (CompareList(sensorData, stopDistances))
+                {
+                    currentWalkMode = Robot.WalkMode.BACKWARDS;
+                }
+                //if turn distances reached
+                else
+                {
+                    if (!CompareList(sensorData, turnDistances))
+                    {
+                        if (wallLeft)
+                        {
+                            if (!CompareList(sensorData, freeDistancesLeft))
+                            {
+                                currentWalkMode = Robot.WalkMode.STOP;
+                                currentTurnMode = Robot.TurnMode.LEFT_SMOOTH;
+                            }
+                        }
+                        else
+                        {
+                            if (!CompareList(sensorData, freeDistancesRight))
+                            {
+                                currentWalkMode = Robot.WalkMode.STOP;
+                                currentTurnMode = Robot.TurnMode.RIGHT_SMOOTH;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        currentWalkMode = Robot.WalkMode.STOP;
+                        //if more problems on the left turn right
+                        if (_problemSide < 0)
+                        {
+                            currentTurnMode = Robot.TurnMode.RIGHT_SMOOTH;
+                            wallLeft = true;
+                        }
+                        //if more problems on the right turn left
+                        else
+                        {
+                            currentTurnMode = Robot.TurnMode.LEFT_SMOOTH;
+                            wallLeft = false;
+                        }
+                    }
+                }
+
+                if (_robot.CurrentWalkMode != currentWalkMode || _robot.CurrentTurnMode != currentTurnMode)
+                    _robot.MoveByMode(currentWalkMode, currentTurnMode);
             }
-            //if there are more problems than expected from measure failures than set result to "problem" (true)
-            if (count >= 10)
-                result = true;
-            Console.WriteLine(count);
-            return result;
+        }
+
+        private static bool CompareList(IList<int> data, IList<int> limits)
+        {
+            var max = data.Count > limits.Count ? limits.Count : data.Count;
+            //how many problems are detected in comparison
+            var count = 0;
+            //loop through lists and compare if there are problems
+            for (var i = 0; i < max; i++)
+            {
+                if (data[i] >= limits[i])
+                    continue;
+                count++;
+                if (i < 135)
+                {
+                    if (_problemSide > -_problemSideRange)
+                    {
+                        _problemSide--;
+                    }
+                }
+                else
+                {
+                    if (_problemSide < _problemSideRange)
+                    {
+                        _problemSide++;
+                    }
+                }
+            }
+            //if there are more problems than expected from measure failures than true (there are problems)
+            return count >= _maxProblems;
         }
     }
 }

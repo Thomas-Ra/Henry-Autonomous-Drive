@@ -20,8 +20,8 @@ namespace HwrBerlin.HenryTasks
         }
 
 
-        private readonly Robot _robot = Initialize();
-        private readonly Arm _arm = Arm.Initialize();
+        private readonly Robot _robot = new Robot();
+        private readonly Arm _arm = new Arm();
 
         private static void Main()
         {

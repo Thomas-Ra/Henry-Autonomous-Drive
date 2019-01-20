@@ -40,31 +40,11 @@ namespace HwrBerlin.Bot.Engines
         /// constructor for robot;
         /// creates engine object; sets walkMode and turnMode to default (no movement)
         /// </summary>
-        private Robot()
+        public Robot()
         {
             _engine = new Engine(Engine.EngineType.Robot);
             CurrentWalkMode = WalkMode.STOP;
             CurrentTurnMode = TurnMode.STRAIGHT;
-        }
-
-        /// <summary>
-        /// creates an object for the robot which provides a connection
-        /// </summary>
-        /// <param name="throwExceptions">can optional redirect the thrown exceptions</param>
-        /// <returns>the initialized robot object if it was successful</returns>
-        public static Robot Initialize(bool throwExceptions = false)
-        {
-            try
-            {
-                return new Robot();
-            }
-            catch (Exception)
-            {
-                if (throwExceptions)
-                    throw;
-
-                return null;
-            }
         }
 
         /// <summary>
