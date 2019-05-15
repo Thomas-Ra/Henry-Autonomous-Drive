@@ -1,13 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using HwrBerlin.Bot;
 using HwrBerlin.Bot.Engines;
 using static HwrBerlin.Bot.Engines.Robot;
+using HwrBerlin.Bot.Scanner;
 
 namespace HwrBerlin.HenryTasks
+
+
 {
     internal class Program
     {
+
         /// <summary>
         /// user can press keys for four directions
         /// </summary>
@@ -28,6 +34,16 @@ namespace HwrBerlin.HenryTasks
             var program = new Program();
 
             program.Start();
+        }
+
+
+        //method fpr printing an array list
+        public void printArray<T>(IEnumerable<T> a)
+        {
+            foreach (var i in a)
+            {
+                Debug.WriteLine(i);
+            }
         }
 
 
@@ -127,6 +143,8 @@ namespace HwrBerlin.HenryTasks
 
         public void Start()
         {
+            _robot.Enable();
+
             if (_robot != null && _robot.Enable())
             {
                 var consoleInput = "";
@@ -143,12 +161,68 @@ namespace HwrBerlin.HenryTasks
                         "'down' - arm gets lower",
                         "'divide' - more space between grippers",
                         "'join' - less space between grippers",
-                        "'task' - starts the task programm");
+                        "'task' - starts the task programm",
+                        "'auto' - starts autodrive");
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
                     var inputArray = consoleInput.Split(' ');
                     switch (inputArray[0])
-                    {
+                    {   
+
+                        //unser Programm startet, wenn auto eingetippt wird
+
+                        case "auto":
+
+                            int velocity = 1;
+                            // reference variable for calling the methods from the scanner class
+                            var instanceScanner = new Scanner();
+                            // list for the median values of the scanner
+                            var medianList = new List<int>();
+
+                            // set on true if a certain distance is undershot (unterschritten)
+                            Boolean stop = false;
+                            // treshold, if undershot, when henry has to stop in mm
+                            int treshold = 700;
+
+                            _robot.Enable();
+
+                            if (_robot != null && _robot.Enable())
+                            {
+
+                                while (stop == false)
+                                {
+                                    // with every iteration of the while loop an actual list is fetched for the distances
+                                    medianList.Clear();
+                                    medianList = instanceScanner.MedianFilter(instanceScanner.GetDataList());
+
+                                    for (int i = 100; i <= 200; i++)
+                                    {
+                                        // checks every degree right infront of henry 
+                                        // if treshold is greater than any degree distance henry stops
+                                        if (treshold > medianList[i])
+                                        {
+                                            // sets stop 
+                                            stop = true;
+                                           _robot.StopImmediately();
+                                        } 
+
+                                    }
+                                        // we need to check if the boolean var is set on true or not
+                                        // if we wouldnt check he would stop for a second and drive forwards
+                                        if( stop == false)
+                                    {
+                                        // henry drives forward at the velocity if stop is on false
+                                        _robot.Move(velocity);
+
+                                    }
+                                        
+
+                                }
+
+                            }
+
+                                break;
+
                         case "stop":
                             _robot.StopImmediately();
                             break;
