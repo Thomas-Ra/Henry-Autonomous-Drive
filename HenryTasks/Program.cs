@@ -6,6 +6,7 @@ using HwrBerlin.Bot;
 using HwrBerlin.Bot.Engines;
 using static HwrBerlin.Bot.Engines.Robot;
 using HwrBerlin.Bot.Scanner;
+using System.Linq;
 
 namespace HwrBerlin.HenryTasks
 
@@ -13,7 +14,7 @@ namespace HwrBerlin.HenryTasks
 {
     internal class Program
     {
-
+        private static Scanner _scanner;
         /// <summary>
         /// user can press keys for four directions
         /// </summary>
@@ -44,6 +45,31 @@ namespace HwrBerlin.HenryTasks
             {
                 Debug.WriteLine(i);
             }
+        }
+
+        /*
+         * Scant den Bereich vor ihm
+         * Gibt true zurück, wenn etwas vor ihm ist
+         * Gibt false zurück, wenn nichts vor ihm ist
+         */
+        public Boolean scanForObstacles(int treshold, List<int> medianList)
+        {
+
+            for (int i = 100; i <= 200; i++)
+            {
+                // checks every degree right infront of henry (100° angle)
+                // if treshold is greater than any degree distance henry stops
+                if (treshold > medianList[i])
+                {
+                    // sets stop 
+                    return true;
+
+                }
+
+            }
+
+            return false;
+
         }
 
 
@@ -162,17 +188,28 @@ namespace HwrBerlin.HenryTasks
                         "'divide' - more space between grippers",
                         "'join' - less space between grippers",
                         "'task' - starts the task programm",
-                        "'auto' - starts autodrive");
+                        "'auto' - starts autodrive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
+                        "'auto2' - starts autodrive",
+                        "'auto3' - starts autodrive");
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
                     var inputArray = consoleInput.Split(' ');
                     switch (inputArray[0])
                     {   
 
-                        //unser Programm startet, wenn auto eingetippt wird
+                        /* Must-Haves:
+                         * auto represents our must haves, these include that Henry stops if a obstacle is
+                         * right infront of him and that he waits a certain amount of time. If the obstacle 
+                         * disappeared Henry moves forward 
+                        */
 
                         case "auto":
 
+                            var instanceAutoDrive = new AutoDriveProgramHT();
+                            instanceAutoDrive.stopIfObstacle();
+
+                            /*
+                            // velocity that henry drives
                             int velocity = 1;
                             // reference variable for calling the methods from the scanner class
                             var instanceScanner = new Scanner();
@@ -181,8 +218,20 @@ namespace HwrBerlin.HenryTasks
 
                             // set on true if a certain distance is undershot (unterschritten)
                             Boolean stop = false;
-                            // treshold, if undershot, when henry has to stop in mm
+                            // treshold, if undershot, henry stops; distance in mm
                             int treshold = 700;
+
+                            // the ammount of time henry waits 
+                            // it takes 46 miliseconds to check 100° in the for loop
+                            // therefore we expect that it takes about 50 ms for one complete loop -> 2 loops per second
+                            // waiting time: ammount of seconds*2
+                            int wait = 40;
+
+                            // counts the ammount of cycles/Iterations
+                            int elapsedCycles = 0;
+
+                            // checks if henry can drive again
+                            Boolean driveAgain = false;
 
                             _robot.Enable();
 
@@ -191,37 +240,114 @@ namespace HwrBerlin.HenryTasks
 
                                 while (stop == false)
                                 {
+
                                     // with every iteration of the while loop an actual list is fetched for the distances
                                     medianList.Clear();
                                     medianList = instanceScanner.MedianFilter(instanceScanner.GetDataList());
 
                                     for (int i = 100; i <= 200; i++)
                                     {
-                                        // checks every degree right infront of henry 
+                                        // checks every degree right infront of henry (100° angle)
                                         // if treshold is greater than any degree distance henry stops
                                         if (treshold > medianList[i])
                                         {
                                             // sets stop 
                                             stop = true;
-                                           _robot.StopImmediately();
-                                        } 
+                                            // sets velocity to zero so that Henry stops
+                                            _robot.Move(0);
+
+
+                                           
+                                        }
 
                                     }
-                                        // we need to check if the boolean var is set on true or not
-                                        // if we wouldnt check he would stop for a second and drive forwards
-                                        if( stop == false)
+                                    // we need to check if the boolean var is set on true or not
+                                    // if we wouldnt check he would stop for a second and drive forwards again
+                                    if (stop == false)
                                     {
                                         // henry drives forward at the velocity if stop is on false
                                         _robot.Move(velocity);
 
+                                        // if stop = true Henry has detected an obstacle
+                                        // we wait for a given ammount of time 
+                                        // if the obstacle is away he drives forward again
                                     }
-                                        
+                                    else
+                                    {
+
+
+
+                                    }
 
                                 }
 
-                            }
+                            }*/
 
-                                break;
+                            break;
+
+                        
+                            /* Can-Haves:
+                             * If Henry detects an obstacle he turns in a random direction and moves foward
+                             */
+                        case "auto2":
+
+                            var watch = System.Diagnostics.Stopwatch.StartNew();
+                            // the code that you want to measure comes here
+
+                            // reference variable for calling the methods from the scanner class
+                            var instanceScanner2 = new Scanner();
+                            // list for the median values of the scanner
+                            var medianList2 = new List<int>();
+
+                            // set on true if a certain distance is undershot (unterschritten)
+                            Boolean stop2 = false;
+                            // treshold, if undershot, henry stops; distance in mm
+                            int treshold2 = 700;
+                            // the ammount of time henry waits
+
+                            _robot.Enable();
+
+                            if (_robot != null && _robot.Enable())
+                            {
+
+                                medianList2.Clear();
+                                medianList2 = instanceScanner2.MedianFilter(instanceScanner2.GetDataList());
+
+                                for (int i = 100; i <= 200; i++)
+                                {
+                                    // checks every degree right infront of henry (100° angle)
+                                    // if treshold is greater than any degree distance henry stops
+                                    if (treshold2 > medianList2[i])
+                                    {
+                                        // sets stop 
+                                        stop2 = true;
+                                        // sets velocity to zero so that Henry stops
+                                        // _robot.Move(0);
+                                        // _robot.StopImmediately();
+                                    }
+
+                                }
+                            }
+                            watch.Stop();
+                            var elapsedMs = watch.ElapsedMilliseconds;
+
+                            ConsoleFormatter.Custom(ConsoleColor.DarkGreen, "Elapsed Miliseconds: " + elapsedMs);
+
+                            Debug.Write("Elapsed Miliseconds: " + elapsedMs);
+                            Debug.WriteLine("Elapsed Miliseconds: " + elapsedMs);
+
+                            Console.WriteLine("Elapsed Miliseconds: " + elapsedMs);
+
+                            break;
+
+                        /* Nice-to-haves:
+                         * If Henry detects an obstacle he turns in a promising direction 
+                         * based on the scanner data and turns in this direction and moves forward
+                         */
+                        case "auto3":
+
+                            break;
+
 
                         case "stop":
                             _robot.StopImmediately();

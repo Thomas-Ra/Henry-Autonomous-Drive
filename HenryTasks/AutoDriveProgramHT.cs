@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+namespace HwrBerlin.HenryTasks
 
-namespace HwrBerlin.HenryAutoDrive
 {
-    public class AutoDriveProgram
+    public class AutoDriveProgramHT
     {
         private static Robot _robot;
         private static Scanner _scanner;
@@ -17,8 +17,9 @@ namespace HwrBerlin.HenryAutoDrive
         private static int _problemSideRange;
         private static int _maxProblems; */
 
-        private static void Main()
+        public void stopIfObstacle()
         {
+            Debug.WriteLine("entering stopIfObstacle()");
             _robot = new Robot();
             _scanner = new Scanner();
 
@@ -55,7 +56,29 @@ namespace HwrBerlin.HenryAutoDrive
                 {
                     // with every iteration of the while loop an actual list is fetched for the distances
                     medianList.Clear();
-                    medianList = instanceScanner.MedianFilter(instanceScanner.GetDataList());
+
+                    try
+                    {
+                        medianList = instanceScanner.MedianFilter(instanceScanner.GetDataList());
+
+                    }
+                    catch (Exception e)
+                    {
+                        if(e is IndexOutOfRangeException){
+
+                            Debug.WriteLine(e.Message);
+                            continue;
+                        }
+                    }
+
+                    if(!(medianList.Count >= 250 && medianList.Count <= 280))
+                    {
+                        Debug.WriteLine("medianList nicht 271 Elemente groß");
+                        Debug.WriteLine("Länge medianList: " + medianList.Count);
+                        continue;
+                    }
+
+                    Debug.WriteLine("Länge medianList: " + medianList.Count);
 
                     for (int i = 100; i <= 200; i++)
                     {
@@ -67,7 +90,7 @@ namespace HwrBerlin.HenryAutoDrive
                             stop = true;
                             // sets velocity to zero so that Henry stops
                             _robot.Move(0);
-                            // _robot.StopImmediately();
+                            
                         }
 
                     }
@@ -89,8 +112,17 @@ namespace HwrBerlin.HenryAutoDrive
 
             //FollowTheWall();
             //vorher: else
-            Console.ReadLine();
-         }
+            // Console.ReadLine();
+            Debug.WriteLine("vor rekursion");
+
+            stop = false;
+            medianList.Clear();
+            stopIfObstacle();
+        }
+
+    }
+
+}
 
          /*
          private static void AutoDrive()
@@ -309,5 +341,3 @@ namespace HwrBerlin.HenryAutoDrive
              //if there are more problems than expected from measure failures than true (there are problems)
              return count >= _maxProblems;
          }*/
-            }
-}
