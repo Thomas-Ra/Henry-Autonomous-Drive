@@ -33,6 +33,8 @@ namespace HwrBerlin.HenryTasks
             // set on true if a certain distance is undershot (unterschritten)
             Boolean stop = false;
             // treshold, if undershot, henry stops; distance in mm
+            //To-DO:
+            //Threshold must be amended towareds the calculation of every degree and its respektive Distance to the corridor-border
             int treshold = 700;
 
             // the ammount of time henry waits 
@@ -79,8 +81,9 @@ namespace HwrBerlin.HenryTasks
                     }
 
                     Debug.WriteLine("Länge medianList: " + medianList.Count);
-
-                    for (int i = 100; i <= 200; i++)
+                    //changed from 100 to 46 and 200 to 2224 ro exclude the degrees where the scanner sees the robot
+                    //but include all relebant degrees for obstacle scanning
+                    for (int i = 46; i <= 224; i++)
                     {
                         // checks every degree right infront of henry (100° angle)
                         // if treshold is greater than any degree distance henry stops
