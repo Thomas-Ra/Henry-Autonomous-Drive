@@ -205,8 +205,10 @@ namespace HwrBerlin.HenryTasks
 
                         case "auto":
 
-                            var instanceAutoDrive = new AutoDriveProgramHT();
-                            instanceAutoDrive.stopIfObstacle();
+            
+                                var instanceAutoDrive = new AutoDriveProgramHT();
+                                instanceAutoDrive.stopIfObstacle();
+                            
 
                             /*
                             // velocity that henry drives

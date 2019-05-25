@@ -103,6 +103,7 @@ namespace HwrBerlin.Bot.Scanner
             }
 
             return distanceData;
+        
         }
 
         /// <summary>
