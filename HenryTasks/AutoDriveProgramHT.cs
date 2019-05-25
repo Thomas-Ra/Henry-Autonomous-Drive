@@ -41,7 +41,24 @@ namespace HwrBerlin.HenryTasks
                 //To-DO:
                 //Threshold must be amended towareds the calculation of every degree and its respektive Distance to the corridor-border
                 int treshold = 700;
+                //threshold for upper corridor, if undershot, henry stops, distance in mm
+                //threshold calculation
+                //rt - radius turning circle
+                var thresholdlist = new List<double>();
+                for (int i=1; i<= 89; i++)
+                {
+                    double rt = 54.35;
+                    int safety_threshold = 700;
+                    double threshold = i / rt;
 
+                    if (threshold > safety_threshold)
+                    {
+                        threshold = safety_threshold;
+                        thresholdlist.Add(threshold);
+                    }
+                    else
+                        thresholdlist.Add(i);
+                }
                 // the ammount of time henry waits 
                 // it takes 46 miliseconds to check 100° in the for loop
                 // therefore we expect that it takes about 50 ms for one complete loop -> 2 loops per second
@@ -93,6 +110,8 @@ namespace HwrBerlin.HenryTasks
                         {
                             // checks every degree right infront of henry (100° angle)
                             // if treshold is greater than any degree distance henry stops
+                            //threshold with whole list of different distances
+                            // if thresholdlist > medianList[i]){}
                             if (treshold > medianList[i])
                             {
                                 // sets stop 
