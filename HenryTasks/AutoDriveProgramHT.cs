@@ -4,11 +4,94 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+
 namespace HwrBerlin.HenryTasks
 
 {
-    public class AutoDriveProgramHT
+     class AutoDriveProgramHT
     {
+        //method fpr printing an array list
+        public void printArray<T>(IEnumerable<T> a)
+        {
+            foreach (var i in a)
+            {
+                Debug.WriteLine(i);
+            }
+        }
+        //global var for henry
+
+        public Boolean checkMedianList(List<int> medianList)
+        {
+            Boolean check = true;
+
+            for (int i = 100; i <= 200; i++)
+            {
+                if(medianList[i] != 0)
+                {
+                    Debug.WriteLine("MedianList OK");
+
+                       
+                        }
+                else
+                {
+                    Debug.WriteLine("MedianList has NULL values");
+                 
+                }
+                 
+            }
+            Debug.WriteLine("Länge Scan Daten  aus der MedianFilter Methode= " + medianList.Count);
+            return check;
+
+        }
+            
+            
+           
+
+
+        public Boolean Scanner(List<int> medianList)
+
+ 
+        {
+            Boolean drive = false;
+            int treshold = 700;
+            //for (int i = 46; i <= 224; i++)
+
+            for (int i = 100; i <= 200; i++)
+            {
+                // checks every degree right infront of henry (100° angle)
+                // if treshold is greater than any degree distance henry stops
+                //threshold with whole list of different distances
+                // if thresholdlist > medianList[i]){}
+                if (treshold > medianList[i])
+                {
+                    // sets stop 
+                    Debug.WriteLine("drive =false");
+                    //Debug.WriteLine(medianList);
+
+
+
+                }
+                else
+                {
+                    Debug.WriteLine("drive = true");
+                    drive = true;
+                    printArray(medianList);
+                    
+
+                }
+            }
+        return drive;
+
+
+            
+            /*
+            Debug.WriteLine("true");
+            Debug.WriteLine("Länge Scan Daten  aus der MedianFilter Methode= " + medianList.Count);
+            return drive;
+            */
+        }
+
+
         private static Robot _robot;
         private static Scanner _scanner;
         private static int velocity = 1;
@@ -106,6 +189,7 @@ namespace HwrBerlin.HenryTasks
                         Debug.WriteLine("Länge medianList: " + medianList.Count);
                         //changed from 100 to 46 and 200 to 2224 ro exclude the degrees where the scanner sees the robot
                         //but include all relebant degrees for obstacle scanning
+
                         for (int i = 46; i <= 224; i++)
                         {
                             // checks every degree right infront of henry (100° angle)

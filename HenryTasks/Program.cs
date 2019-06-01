@@ -8,11 +8,12 @@ using static HwrBerlin.Bot.Engines.Robot;
 using HwrBerlin.Bot.Scanner;
 using System.Linq;
 
+
 namespace HwrBerlin.HenryTasks
 
 
 {
-    internal class Program
+     internal class Program : AutoDriveProgramHT
     {
         private static Scanner _scanner;
         /// <summary>
@@ -205,8 +206,8 @@ namespace HwrBerlin.HenryTasks
 
                         case "auto":
 
-            
-                                var instanceAutoDrive = new AutoDriveProgramHT();
+
+                                AutoDriveProgramHT instanceAutoDrive = new AutoDriveProgramHT();
                                 instanceAutoDrive.stopIfObstacle();
                             
 
@@ -348,8 +349,30 @@ namespace HwrBerlin.HenryTasks
                          */
                         case "auto3":
 
+                            var instanceScanner3 = new Scanner();
+                            Auto1 instanceAuto = new Auto1();
+
+                            //int neverEnding = 1;
+                            //while (neverEnding == 1) {
+                                instanceAuto.decideStopOrDrive();
+
+                                /*Test
+                                for (int i = 0; i < 100; i++)
+                                {
+                                    instanceAuto.ScanAndCheck();
+                                }
+                                */
+                            //}
+                               
+
+                            
+
                             break;
 
+                        case "auto4":
+
+
+                            break;
 
                         case "stop":
                             _robot.StopImmediately();
