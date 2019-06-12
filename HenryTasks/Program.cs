@@ -191,7 +191,10 @@ namespace HwrBerlin.HenryTasks
                         "'task' - starts the task programm",
                         "'auto' - starts autodrive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
                         "'auto2' - starts autodrive",
-                        "'auto3' - starts autodrive");
+                        "'auto3' - starts autodrive",
+                        "'auto4' - starts autodrive",
+                        "'testauto' - starts testauto, no scanning, only sample data");
+                
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
                     var inputArray = consoleInput.Split(' ');
@@ -347,32 +350,95 @@ namespace HwrBerlin.HenryTasks
                          * If Henry detects an obstacle he turns in a promising direction 
                          * based on the scanner data and turns in this direction and moves forward
                          */
+                         //Case for just executing the Check()-Method and its output
                         case "auto3":
-
-                            var instanceScanner3 = new Scanner();
                             Auto1 instanceAuto = new Auto1();
+                            int loop_infinitely = 1;
+                            while (loop_infinitely == 1) {
+                                instanceAuto.Check();
+                            }
 
+                            /*
                             //int neverEnding = 1;
                             //while (neverEnding == 1) {
                                 instanceAuto.decideStopOrDrive();
+                                */  
 
-                                /*Test
-                                for (int i = 0; i < 100; i++)
+                                //Test
+                                /*
+                                for (int i = 0; i < 10000; i++)
                                 {
-                                    instanceAuto.ScanAndCheck();
+                                    instanceAuto.Check();
+                                    Debug.WriteLine(i);
                                 }
-                                */
+                                
                             //}
-                               
-
+                            */
+                            break;
                             
-
+                            //case for executing the output of the decide() Method in the class Auto1
+                            case "auto4":
+                            //new instance of class Auto1
+                            Auto1 instanceAuto2 = new Auto1();
+                            //Looping the method call infinitifely
+                            int infinity = 1;
+                            while (infinity == 1) {
+                                //Calling the Method
+                                instanceAuto2.Decide();
+                            }
                             break;
 
-                        case "auto4":
+                            //case for testing: utilizes the methods testListnoObstacle() , testListObstacle() , testCheck() from the class Auto1
+                            case "testauto":
+                            //create INstanz of class Auto1
+                            Auto1 instanceAuto5 = new Auto1();
+                            //initialize four lists
+                            var list1= new List<int>();
+                            var list2= new List<int>();
+                            var list3= new List<int>();
+                            var list4= new List<int>();
+                            //set the initilized lists with the methods testListnoObstacle() and testListIbstacle()
+                            //two lists with values > safety_threshold --> lists that do not contain obstacles
+                            //two lists with values < safety_threshold --> lists that do contain obstacles
+                            list1=instanceAuto5.testListnoObstacle();
+                            list2=instanceAuto5.testListObstacle();
+                            list3=instanceAuto5.testListnoObstacle();
+                            list4=instanceAuto5.testListObstacle();
+                            //Output for Debugger
+                            Debug.WriteLine("Liste 1 Länge: "+ list1.Count());
+                            Debug.WriteLine("Liste 2 Länge: "+ list2.Count());
+                            Debug.WriteLine("Liste 3 Länge: "+ list3.Count());
+                            Debug.WriteLine("Liste 4 Länge: "+ list4.Count());
+                            //Output for Debugger
+                            Debug.WriteLine("liste1: "+ list1.ToString());
+                            Debug.WriteLine("liste2: "+ list2.ToString());
+                            Debug.WriteLine("liste3: "+ list3.ToString());
+                            Debug.WriteLine("liste4: "+ list4.ToString());
+                            //Looping the program infititely, exit via closing the window
+                            int neverEnding = 1;
+                            while (neverEnding == 1) {
 
-
-                            break;
+                                //Test runs through with 10 iterations for each for loop
+                                //each for loop checks the allocated list through with the testCheck() - Method
+                                //further output for debugging is directly coded within the testCheck()- Method
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    instanceAuto5.testCheck(list1);
+                                }
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    instanceAuto5.testCheck(list2);
+                                }
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    instanceAuto5.testCheck(list3);
+                                }
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    instanceAuto5.testCheck(list4);
+                                }  
+                            }
+                             break;
 
                         case "stop":
                             _robot.StopImmediately();

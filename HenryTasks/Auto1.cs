@@ -15,43 +15,61 @@ namespace HwrBerlin.HenryTasks
     public class Auto1
     {
         //Initializing objects and variables:
-        public static Robot _robot;
-        public static Scanner _scanner;
+        public static Robot _robot = new Robot();
+        public static Scanner _scanner = new Scanner();
         public static int velocity = 1;
         public static int safety_threshold = 700;
 
         //METHODS FOR AUTONOMOUS DRIVING FUNCTIONALITY
+
         //1. SCAN
-        public Boolean ScanAndCheck()
-        {
-            _robot = new Robot();
-            _scanner = new Scanner();
-            Boolean drive = false;
+        //this method utilizes the class scanner.cs directly by calling on  the methods GetDataList() as well as MedianFilter()
+        //The try-catch block aids in case the received list from those called methods has a lenght of 0
+        public List<int> Scan(){
+            //initialize local medianList
             var medianList = new List<int>();
-
-            //for (int i = 46; i <= 224; i++)
-            //For Testing we use values from 100 to 200 degrees in front of the robot
-            for (int i = 100; i <= 200; i++)
-            {
-                try
-                {
-                    medianList = _scanner.MedianFilter(_scanner.GetDataList());
-
-                }
+            try { 
+                medianList=_scanner.MedianFilter(_scanner.GetDataList());
+             }
                 catch (Exception e)
                 {
                     if (e is IndexOutOfRangeException)
                     {
 
                         Debug.WriteLine(e.Message);
-                        continue;
+                        Debug.WriteLine("Länge MedianListe: "+ medianList.Count());
+                        //continue;
+                        //break;
                     }
                 }
-                // checks every degree right infront of henry (100° angle)
-                // if treshold is greater than any degree distance henry stops
-                //threshold with whole list of different distances
-                // if thresholdlist > medianList[i]){}
-                if (safety_threshold > medianList[i])
+            return medianList;
+
+         }
+        //2. CHECK
+        //This method uses the output of the SCAN()-Method above as input
+        //boolean method, returns the value allocated with the two robot-states: drive or stop
+        //if no obstacle occurs within the defined range, the boolean drive is set to true 
+        //if an obstacle occurs within the defined range, the boolean drive is set to false
+        //for the initial start of the robot and program, the boolsche variable is set to false in order to maintain a stop until the frist scan has been initited 
+        public Boolean Check()
+        {
+            Debug.WriteLine("Entering Check-Method");
+            Boolean drive = false;
+            // checks every degree right infront of henry (100° angle)
+            // if treshold is greater than any degree distance henry stops
+            var medianList = new List<int>();
+            medianList = Scan();
+            Debug.WriteLine("Länge MedianListe: "+medianList.Count());
+            for (int i = 100; i <= 200; i++)
+            {
+                Debug.WriteLine("Check-Method: Entering For Loop");
+                if(medianList.Count == 0){
+                    Debug.WriteLine(" Liste ist leer :(");
+                    //break;
+                    //continue;
+                    return drive;
+                }
+                else if (safety_threshold > medianList[i])
                 {
                     // sets stop
                     Debug.WriteLine(medianList[i]);
@@ -59,17 +77,17 @@ namespace HwrBerlin.HenryTasks
                     drive = false;
                     return drive;
                 }
-                else if (safety_threshold < medianList[i])
+                else if (safety_threshold <= medianList[i])
                 {
                     Debug.WriteLine("drive == true");
                     drive = true;
                     Debug.WriteLine(medianList[i]);
-                    //printArray(medianList);
                     return drive;
                 }
             }
             return drive;
         }
+        //2 B) 
         //Implementation for the real threshold distances (variable, depending on degree)
         //needs checking for right calculation!
         public Boolean ScanAndCheck2()
@@ -110,53 +128,103 @@ namespace HwrBerlin.HenryTasks
                     //drive is allowed
                     Debug.WriteLine("drive = true");
                     drive = true;
-                    printArray(medianList);
+                    //printArray(medianList);
                 }
             }
             return drive;
         }
-        //2. DECIDE
-        public void decideStopOrDrive()
+        //3. DECIDE
+        //Based on the output value of the method CHECK(), this following method sets the robot into the repsective modus, either stop or drive
+        public void Decide()
         {
-            _robot = new Robot();
-            _scanner = new Scanner();
             // velocity that henry drives
-            int velocity = 1;
-            // list for the median values of the scanner
-            var medianList = new List<int>();
-            _robot.Enable();
+            //stop and drive mode are represented by the integer values 0 and 1
+            int drive_mode = 1;
+            int stop_mode = 0;
 
+            _robot.Enable();
             if (_robot != null && _robot.Enable())
             {
-                Debug.WriteLine("Länge medianList: " + medianList.Count);
-                Auto1 instanceAuto1 = new Auto1();
-
-                Boolean drive = instanceAuto1.ScanAndCheck();
+                //Calling the method Check() to allocate the boolsche value correctly from the scan data
+                Boolean drive = Check();
+                //setting the robot into the repsective velocity according to the above input from the method call
                 if (drive == false)
                 {
                     // sets velocity to zero so that Henry stops
-                    _robot.Move(0);
+                    _robot.Move(stop_mode);
                     //return;
                 }
                 else if (drive == true)
                 {
-                    //sets velocity to 1so that henry drives
-                    _robot.Move(velocity);
+                    //sets velocity to 1 so that henry drives
+                    _robot.Move(drive_mode);
                 }
-
-
             }
-
         }
 
         //method fpr printing an array list
-        public void printArray<T>(IEnumerable<T> a)
+        /*public void printArray<T>(IEnumerable<T> a)
         {
             foreach (var i in a)
             {
                 Debug.WriteLine(i);
             }
+        }*/
+
+            //4. TEST
+            //The following methods have been implemented in order to test the logik and structure of the above methods
+            //fake lists are beeing created within the methods testListnoObstacle() and testlistObstacle()
+            //fake list with values > safety_threshold, no obstacles
+        public List<int> testListnoObstacle (){
+            var filltestList = new List<int>();
+            for(int i =0; i<=270;i++){
+                //i=700;
+                filltestList.Add(700);
+}
+            return filltestList;
+
+}
+        //fake list with values < safety_threshold, obstacles are implied
+        public List<int> testListObstacle (){
+               var filltestList2 = new List<int>();
+            for (int i=0;i<=270;i++){
+                //i=699;
+                filltestList2.Add(699);
+                //return testList;
+}
+            return filltestList2;
+
+}
+        public Boolean testCheck(List<int> testList)
+        {
+            //_robot = new Robot();
+            //_scanner = new Scanner();
+            Boolean drive = false;
+
+            for (int i = 100; i <= 200; i++)
+            {
+                if(testList.Count == 0){
+                    Debug.WriteLine(" Liste ist leer :(");
+                    continue;
+                }
+                if (safety_threshold > testList[i])
+                {
+                    // sets stop
+                    Debug.WriteLine(testList[i]);
+                    Debug.WriteLine("drive == false");
+                    drive = false;
+                    return drive;
+                }
+                else if (safety_threshold <= testList[i])
+                {
+                    Debug.WriteLine("drive == true");
+                    drive = true;
+                    Debug.WriteLine(testList[i]);
+                    //printArray(medianList);
+                    return drive;
+                }
+            }
+            return drive;
         }
     }
 }
-
