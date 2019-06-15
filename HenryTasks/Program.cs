@@ -190,7 +190,7 @@ namespace HwrBerlin.HenryTasks
                         "'join' - less space between grippers",
                         "'task' - starts the task programm",
                         "'auto' - starts autodrive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
-                        "'auto2' - starts autodrive",
+                        "'testcorridor' - testing check2() Method, ",
                         "'auto3' - starts autodrive",
                         "'auto4' - starts autodrive",
                         "'testauto' - starts testauto, no scanning, only sample data");
@@ -206,150 +206,28 @@ namespace HwrBerlin.HenryTasks
                          * right infront of him and that he waits a certain amount of time. If the obstacle 
                          * disappeared Henry moves forward 
                         */
-
+                        //
                         case "auto":
 
-
-                                AutoDriveProgramHT instanceAutoDrive = new AutoDriveProgramHT();
-                                instanceAutoDrive.stopIfObstacle();
-                            
-
-                            /*
-                            // velocity that henry drives
-                            int velocity = 1;
-                            // reference variable for calling the methods from the scanner class
-                            var instanceScanner = new Scanner();
-                            // list for the median values of the scanner
-                            var medianList = new List<int>();
-
-                            // set on true if a certain distance is undershot (unterschritten)
-                            Boolean stop = false;
-                            // treshold, if undershot, henry stops; distance in mm
-                            int treshold = 700;
-
-                            // the ammount of time henry waits 
-                            // it takes 46 miliseconds to check 100° in the for loop
-                            // therefore we expect that it takes about 50 ms for one complete loop -> 2 loops per second
-                            // waiting time: ammount of seconds*2
-                            int wait = 40;
-
-                            // counts the ammount of cycles/Iterations
-                            int elapsedCycles = 0;
-
-                            // checks if henry can drive again
-                            Boolean driveAgain = false;
-
-                            _robot.Enable();
-
-                            if (_robot != null && _robot.Enable())
-                            {
-
-                                while (stop == false)
-                                {
-
-                                    // with every iteration of the while loop an actual list is fetched for the distances
-                                    medianList.Clear();
-                                    medianList = instanceScanner.MedianFilter(instanceScanner.GetDataList());
-
-                                    for (int i = 100; i <= 200; i++)
-                                    {
-                                        // checks every degree right infront of henry (100° angle)
-                                        // if treshold is greater than any degree distance henry stops
-                                        if (treshold > medianList[i])
-                                        {
-                                            // sets stop 
-                                            stop = true;
-                                            // sets velocity to zero so that Henry stops
-                                            _robot.Move(0);
-
-
-                                           
-                                        }
-
-                                    }
-                                    // we need to check if the boolean var is set on true or not
-                                    // if we wouldnt check he would stop for a second and drive forwards again
-                                    if (stop == false)
-                                    {
-                                        // henry drives forward at the velocity if stop is on false
-                                        _robot.Move(velocity);
-
-                                        // if stop = true Henry has detected an obstacle
-                                        // we wait for a given ammount of time 
-                                        // if the obstacle is away he drives forward again
-                                    }
-                                    else
-                                    {
-
-
-
-                                    }
-
-                                }
-
-                            }*/
-
-                            break;
-
-                        
-                            /* Can-Haves:
-                             * If Henry detects an obstacle he turns in a random direction and moves foward
-                             */
-                        case "auto2":
-
-                            var watch = System.Diagnostics.Stopwatch.StartNew();
-                            // the code that you want to measure comes here
-
-                            // reference variable for calling the methods from the scanner class
-                            var instanceScanner2 = new Scanner();
-                            // list for the median values of the scanner
-                            var medianList2 = new List<int>();
-
-                            // set on true if a certain distance is undershot (unterschritten)
-                            Boolean stop2 = false;
-                            // treshold, if undershot, henry stops; distance in mm
-                            int treshold2 = 700;
-                            // the ammount of time henry waits
-
-                            _robot.Enable();
-
-                            if (_robot != null && _robot.Enable())
-                            {
-
-                                medianList2.Clear();
-                                medianList2 = instanceScanner2.MedianFilter(instanceScanner2.GetDataList());
-
-                                for (int i = 100; i <= 200; i++)
-                                {
-                                    // checks every degree right infront of henry (100° angle)
-                                    // if treshold is greater than any degree distance henry stops
-                                    if (treshold2 > medianList2[i])
-                                    {
-                                        // sets stop 
-                                        stop2 = true;
-                                        // sets velocity to zero so that Henry stops
-                                        // _robot.Move(0);
-                                        // _robot.StopImmediately();
-                                    }
-
-                                }
+                            Auto1 instanceAuto_1 = new Auto1();
+                            //Looping the method call infinitifely
+                            int neverEnding = 1;
+                            while (neverEnding == 1) {
+                                //Calling the Method
+                                instanceAuto_1.Decide();
                             }
-                            watch.Stop();
-                            var elapsedMs = watch.ElapsedMilliseconds;
-
-                            ConsoleFormatter.Custom(ConsoleColor.DarkGreen, "Elapsed Miliseconds: " + elapsedMs);
-
-                            Debug.Write("Elapsed Miliseconds: " + elapsedMs);
-                            Debug.WriteLine("Elapsed Miliseconds: " + elapsedMs);
-
-                            Console.WriteLine("Elapsed Miliseconds: " + elapsedMs);
-
+                            break;
+                        //case for testing the check2() Method in order to check the thresholdlist and comparison with medianlist
+                        case "testcorridor":
+                            Auto1 instanceAuto1_2 = new Auto1();
+                            var thresholdlist = new List<double>();
+                            thresholdlist = instanceAuto1_2.generateCorridorList();
+                            int forever = 1;
+                            while (forever==1){
+                            instanceAuto1_2.Check2(thresholdlist);
+                            }
                             break;
 
-                        /* Nice-to-haves:
-                         * If Henry detects an obstacle he turns in a promising direction 
-                         * based on the scanner data and turns in this direction and moves forward
-                         */
                          //Case for just executing the Check()-Method and its output
                         case "auto3":
                             Auto1 instanceAuto = new Auto1();
@@ -358,22 +236,6 @@ namespace HwrBerlin.HenryTasks
                                 instanceAuto.Check();
                             }
 
-                            /*
-                            //int neverEnding = 1;
-                            //while (neverEnding == 1) {
-                                instanceAuto.decideStopOrDrive();
-                                */  
-
-                                //Test
-                                /*
-                                for (int i = 0; i < 10000; i++)
-                                {
-                                    instanceAuto.Check();
-                                    Debug.WriteLine(i);
-                                }
-                                
-                            //}
-                            */
                             break;
                             
                             //case for executing the output of the decide() Method in the class Auto1
@@ -415,8 +277,8 @@ namespace HwrBerlin.HenryTasks
                             Debug.WriteLine("liste3: "+ list3.ToString());
                             Debug.WriteLine("liste4: "+ list4.ToString());
                             //Looping the program infititely, exit via closing the window
-                            int neverEnding = 1;
-                            while (neverEnding == 1) {
+                            int nevereverEnding = 1;
+                            while (nevereverEnding == 1) {
 
                                 //Test runs through with 10 iterations for each for loop
                                 //each for loop checks the allocated list through with the testCheck() - Method

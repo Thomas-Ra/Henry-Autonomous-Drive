@@ -20,6 +20,9 @@ namespace HwrBerlin.HenryTasks
         public static int velocity = 1;
         public static int safety_threshold = 700;
 
+        
+
+
         //METHODS FOR AUTONOMOUS DRIVING FUNCTIONALITY
 
         //1. SCAN
@@ -72,7 +75,7 @@ namespace HwrBerlin.HenryTasks
                 else if (safety_threshold > medianList[i])
                 {
                     // sets stop
-                    Debug.WriteLine(medianList[i]);
+                    Debug.WriteLine("Aktueller Wert aus MedianListe"+medianList[i]);
                     Debug.WriteLine("drive == false");
                     drive = false;
                     return drive;
@@ -81,53 +84,109 @@ namespace HwrBerlin.HenryTasks
                 {
                     Debug.WriteLine("drive == true");
                     drive = true;
-                    Debug.WriteLine(medianList[i]);
+                    Debug.WriteLine("Aktueller Wert aus MedianListe"+medianList[i]);
                     return drive;
                 }
             }
             return drive;
         }
-        //2 B) 
-        //Implementation for the real threshold distances (variable, depending on degree)
-        //needs checking for right calculation!
-        public Boolean ScanAndCheck2()
+        /**
+         * getting a list with 181 values for a corridor
+         **/
+        public List<double> generateCorridorList()
         {
-            _robot = new Robot();
-            _scanner = new Scanner();
-            Boolean drive = false;
-            var medianList = new List<int>();
             var thresholdlist = new List<double>();
-            for (int i = 1; i <= 89; i++)
+            var reverseThresholdlist = new List<double>();
+            //Turning Radius of Robot = 44,35
+            // Adding an extra ten cm safety distance to the radius on both sides
+            //safety_radius=44,35 + 10 + 10 = 64,35
+            double safety_radius = 64.35;
+            //initializing of values for the corridor
+            //adding the safety_radius itself as value for 0 degrees, as the calculation starts at 1 degree
+            thresholdlist.Add(safety_radius);
+            for (int i = 1; i <= 90; i++)
             {
-                double rt = 54.35;
-                double threshold = i / rt;
+                double threshold =  safety_radius / Math.Cos((Math.PI * i / 180.0))  ;
                 if (threshold > safety_threshold)
                 {
                     threshold = safety_threshold;
                     thresholdlist.Add(threshold);
                 }
                 else
-                    thresholdlist.Add(i);
+                    thresholdlist.Add(threshold);
             }
-            medianList = _scanner.MedianFilter(_scanner.GetDataList());
-            for (int i = 46; i <= 224; i++)
+            //adding the value for the safety_threshold to the list for the respective 90 degrees
+            thresholdlist.Add(safety_threshold);
+            for (int i = 179; i >= 90; i--)
             {
+                thresholdlist.Add(thresholdlist[i-89]);
+            }
+            ////adding the safety_radius itself as value for 181 degrees, same as for degree 0, respective Position 0 within the list
+            thresholdlist.Add(thresholdlist[0]);
+
+            //reversing list
+            //reverseThresholdlist.Add(thresholdlist.Reverse().ToDouble());
+            // adding reversed list
+            //thresholdlist.Add(reverseThresholdlist);
+            //return the list
+            return thresholdlist;
+        }
+
+
+        //2 B) 
+        //Implementation for the real threshold distances (variable, depending on degree)
+        //needs checking for right calculation!
+        public Boolean Check2( List<double> thresholdlist)
+        {
+            Debug.WriteLine("Entering Check2 Method");
+            Debug.WriteLine("printing the threshod list via print Method");
+
+            /*for (int i=0; i<=183; i++){
+                Debug.WriteLine("printing the threshod list via direct for loop");
+               Debug.WriteLine(thresholdlist[i]);
+            }*/
+            //printArray(thresholdlist);
+            var thresholdlist_local= new List<double>();
+            thresholdlist_local=thresholdlist;
+            Boolean drive = false;
+            var medianList = new List<int>();
+            var medianList_cut= new List<double>();
+            //calling scan method to get the list with median values
+            medianList = Scan();
+            medianList.Cast<double>();
+            for (int i = 45; i <= 224; i++){
+                medianList_cut.Add(medianList[i]);
+             }
+            // comparing the mdeianlist with the thresholdlist to set the boolean value drive according to the output
+            // initializing both iterators for the check
+            //Check: compare values from thresholdlist with the values fro, the repsecrtive degree in medianlist
+            for (int i = 0; i <= 179; i++)
+            {
+                Debug.WriteLine("Länge Thresholdliste= "+thresholdlist_local.Count());
+                Debug.WriteLine("Länge MedianListe= "+ medianList_cut.Count());
                 // checks every degree right infront of henry (100° angle)
                 // if treshold is greater than any degree distance henry stops
-                //threshold with whole list of different distances
+                // threshold with whole list of different distances
                 // if thresholdlist > medianList[i]){}
-                if (thresholdlist[i] > medianList[i])
+                if (safety_threshold >  medianList_cut[i])
                 {
                     // sets stop 
-                    Debug.WriteLine("drive =false");
+                    Debug.WriteLine("Aktueller Wert Thresholdlist= "+thresholdlist_local[i]);
+                    Debug.WriteLine("Aktueller Wert medianList= "+ medianList_cut[i]);
+                    Debug.WriteLine("drive = false");
+                    drive=false;
+                    return drive;
                     //Debug.WriteLine(medianList);
 
                 }
-                else
+                else if (safety_threshold <=  medianList_cut[i])
                 {
                     //drive is allowed
+                    Debug.WriteLine("Aktueller Wert Thresholdlist= "+thresholdlist_local[i]);
+                    Debug.WriteLine("Aktueller Wert medianListt= " + medianList_cut[i]);
                     Debug.WriteLine("drive = true");
                     drive = true;
+                    return drive;
                     //printArray(medianList);
                 }
             }
@@ -163,13 +222,13 @@ namespace HwrBerlin.HenryTasks
         }
 
         //method fpr printing an array list
-        /*public void printArray<T>(IEnumerable<T> a)
+        public void printArray<T>(IEnumerable<T> a)
         {
             foreach (var i in a)
             {
                 Debug.WriteLine(i);
             }
-        }*/
+        }
 
             //4. TEST
             //The following methods have been implemented in order to test the logik and structure of the above methods
