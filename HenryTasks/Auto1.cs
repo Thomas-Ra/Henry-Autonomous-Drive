@@ -20,9 +20,6 @@ namespace HwrBerlin.HenryTasks
         public static int velocity = 1;
         public static int safety_threshold = 700;
 
-        
-
-
         //METHODS FOR AUTONOMOUS DRIVING FUNCTIONALITY
 
         //1. SCAN
@@ -56,40 +53,39 @@ namespace HwrBerlin.HenryTasks
         //for the initial start of the robot and program, the boolsche variable is set to false in order to maintain a stop until the frist scan has been initited 
         public Boolean Check()
         {
-            Debug.WriteLine("Entering Check-Method");
-            Boolean drive = false;
-            // checks every degree right infront of henry (100° angle)
-            // if treshold is greater than any degree distance henry stops
-            var medianList = new List<int>();
-            medianList = Scan();
-            Debug.WriteLine("Länge MedianListe: "+medianList.Count());
-            for (int i = 100; i <= 200; i++)
-            {
+                /*for(int i =0; i<=medianList.Count()-1; i++){ 
+                Debug.WriteLine("Index: "+ i +" --> "+ medianList[i]);
+                 }*/
+                 var medianList = new List<int>();
+                 medianList= Scan();
+                 Boolean drive = false;
+                for (int i = 100; i <= 200; i++)
+                {
                 Debug.WriteLine("Check-Method: Entering For Loop");
                 if(medianList.Count == 0){
                     Debug.WriteLine(" Liste ist leer :(");
-                    //break;
-                    //continue;
-                    return drive;
                 }
                 else if (safety_threshold > medianList[i])
                 {
                     // sets stop
-                    Debug.WriteLine("Aktueller Wert aus MedianListe"+medianList[i]);
+                    Debug.WriteLine("Aktueller Wert aus MedianListe "+medianList[i]);
+                    Debug.WriteLine("Aktueller Index aus MedianListe: "+i);
                     Debug.WriteLine("drive == false");
                     drive = false;
                     return drive;
                 }
                 else if (safety_threshold <= medianList[i])
                 {
-                    Debug.WriteLine("drive == true");
+                    //Debug.WriteLine("drive == true");
                     drive = true;
-                    Debug.WriteLine("Aktueller Wert aus MedianListe"+medianList[i]);
-                    return drive;
+                    Debug.WriteLine("Aktueller Wert aus MedianListe "+medianList[i]);
+                    Debug.WriteLine("Aktueller Index aus MedianListe: "+i);
                 }
             }
+            Debug.WriteLine(drive.ToString());
             return drive;
         }
+
         /**
          * getting a list with 181 values for a corridor
          **/
@@ -100,13 +96,13 @@ namespace HwrBerlin.HenryTasks
             //Turning Radius of Robot = 44,35
             // Adding an extra ten cm safety distance to the radius on both sides
             //safety_radius=44,35 + 10 + 10 = 64,35
-            double safety_radius = 64.35;
+            double safety_radius = 94.35;
             //initializing of values for the corridor
             //adding the safety_radius itself as value for 0 degrees, as the calculation starts at 1 degree
             thresholdlist.Add(safety_radius);
             for (int i = 1; i <= 90; i++)
             {
-                double threshold =  safety_radius / Math.Cos((Math.PI * i / 180.0))  ;
+                double threshold =  safety_radius / Math.Cos((Math.PI * i / 180.0)) ;
                 if (threshold > safety_threshold)
                 {
                     threshold = safety_threshold;
@@ -136,59 +132,47 @@ namespace HwrBerlin.HenryTasks
         //2 B) 
         //Implementation for the real threshold distances (variable, depending on degree)
         //needs checking for right calculation!
-        public Boolean Check2( List<double> thresholdlist)
+        public Boolean Check2()
         {
             Debug.WriteLine("Entering Check2 Method");
-            Debug.WriteLine("printing the threshod list via print Method");
-
-            /*for (int i=0; i<=183; i++){
-                Debug.WriteLine("printing the threshod list via direct for loop");
-               Debug.WriteLine(thresholdlist[i]);
-            }*/
-            //printArray(thresholdlist);
-            var thresholdlist_local= new List<double>();
-            thresholdlist_local=thresholdlist;
+            //set drive = false as default
             Boolean drive = false;
-            var medianList = new List<int>();
-            var medianList_cut= new List<double>();
-            //calling scan method to get the list with median values
+            //get medianlist via scan() method after declaration of local list
+            List<int> medianList = new List<int>();
             medianList = Scan();
-            medianList.Cast<double>();
-            for (int i = 45; i <= 224; i++){
-                medianList_cut.Add(medianList[i]);
-             }
-            // comparing the mdeianlist with the thresholdlist to set the boolean value drive according to the output
-            // initializing both iterators for the check
+            //get Thresholdlist via generateCorridor() Method
+            List<double> thresholdlist = new List<double>();
+            thresholdlist = generateCorridorList();
             //Check: compare values from thresholdlist with the values fro, the repsecrtive degree in medianlist
-            for (int i = 0; i <= 179; i++)
+            int i = 0;
+            int j = 45;
+            while (i < thresholdlist.Count()-1 && j < medianList.Count()-1)
             {
-                Debug.WriteLine("Länge Thresholdliste= "+thresholdlist_local.Count());
-                Debug.WriteLine("Länge MedianListe= "+ medianList_cut.Count());
-                // checks every degree right infront of henry (100° angle)
-                // if treshold is greater than any degree distance henry stops
-                // threshold with whole list of different distances
-                // if thresholdlist > medianList[i]){}
-                if (safety_threshold >  medianList_cut[i])
+                Debug.WriteLine("Aktueller Index Thresholdliste "+ i);
+                Debug.WriteLine("Länge Thresholdliste= "+thresholdlist.Count());
+                Debug.WriteLine("Aktueller Index MedianListe "+j);
+                Debug.WriteLine("Länge MedianListe= "+ medianList.Count());
+                //Check Algorithm to set the boolean drive according to the output of comparison
+                 if (thresholdlist[i] > medianList[j])
                 {
-                    // sets stop 
-                    Debug.WriteLine("Aktueller Wert Thresholdlist= "+thresholdlist_local[i]);
-                    Debug.WriteLine("Aktueller Wert medianList= "+ medianList_cut[i]);
-                    Debug.WriteLine("drive = false");
-                    drive=false;
+                    // sets stop
+                    Debug.WriteLine("Aktueller Index Thresholdliste "+ j);
+                    Debug.WriteLine("Aktueller Index Medianliste "+ i);
+                    Debug.WriteLine("Aktueller Wert aus MedianListe" + medianList[j]);
+                    Debug.WriteLine("drive == false");
+                    drive = false;
                     return drive;
-                    //Debug.WriteLine(medianList);
-
                 }
-                else if (safety_threshold <=  medianList_cut[i])
+                else if (thresholdlist[i] <= medianList[j])
                 {
-                    //drive is allowed
-                    Debug.WriteLine("Aktueller Wert Thresholdlist= "+thresholdlist_local[i]);
-                    Debug.WriteLine("Aktueller Wert medianListt= " + medianList_cut[i]);
-                    Debug.WriteLine("drive = true");
+                    Debug.WriteLine("drive == true");
                     drive = true;
-                    return drive;
-                    //printArray(medianList);
-                }
+                    Debug.WriteLine("Aktueller Index Thresholdliste "+ j);
+                    Debug.WriteLine("Aktueller Index Medianliste "+ i);
+                    Debug.WriteLine("Aktueller Wert aus MedianListe" + medianList[j]);      
+                 }
+                i++;
+                j++;
             }
             return drive;
         }
@@ -220,6 +204,108 @@ namespace HwrBerlin.HenryTasks
                 }
             }
         }
+
+        //3. DECIDE#2 (calling Check2())
+        //Based on the output value of the method CHECK(), this following method sets the robot into the repsective modus, either stop or drive
+        public void Decide_basedonthresholdlist()
+        {
+            // velocity that henry drives
+            //stop and drive mode are represented by the integer values 0 and 1
+            int drive_mode = 1;
+            int stop_mode = 0;
+
+            _robot.Enable();
+            if (_robot != null && _robot.Enable())
+            {
+                //Calling the method Check2() to allocate the boolsche value correctly from the scan data
+                Boolean drive = Check2();
+                //setting the robot into the repsective velocity according to the above input from the method call
+                if (drive == false)
+                {
+                    // sets velocity to zero so that Henry stops
+                    _robot.Move(stop_mode);
+                    //return;
+                }
+                else if (drive == true)
+                {
+                    //sets velocity to 1 so that henry drives
+                    _robot.Move(drive_mode);
+                }
+            }
+        }
+
+        /** Decides where to move. Turns henry either a certain ammount of degrees left or right.
+         * 
+         **/
+        public void checkLeftOrRight(){
+
+            int left = 0;
+            int right = 0;
+
+            List<int> medianList = new List<int>();
+            medianList = Scan();
+
+            for(int i = 0; i <= 90; i++){
+
+                if(medianList[i] < safety_threshold){
+
+                    left++;
+                }
+            }
+
+            for(int i = 91; i <= 180; i++){
+
+                if(medianList[i] < safety_threshold){
+
+                    left++;
+                }
+            }
+
+            if(right > left){
+
+                _robot.TurnInDegrees(45);
+            } else if( right < left){
+
+                 _robot.TurnInDegrees(-45);
+            } else if ( right == left){
+
+                 _robot.TurnInDegrees(180);
+            }
+
+        }
+
+
+        /**
+         * 
+         **/
+        public void driveLeftOrRight(){
+
+            int drive_mode = 1;
+            int stop_mode = 0;
+
+            _robot.Enable();
+            if (_robot != null && _robot.Enable())
+            {
+                //Calling the method Check2() to allocate the boolsche value correctly from the scan data
+                Boolean drive = Check2();
+                //setting the robot into the repsective velocity according to the above input from the method call
+                if (drive == false)
+                {
+                    // sets velocity to zero so that Henry stops
+                    _robot.Move(stop_mode);
+                    checkLeftOrRight();
+                    drive = true;
+                }
+                else if (drive == true)
+                {
+                    //sets velocity to 1 so that henry drives
+                    _robot.Move(drive_mode);
+                }
+            }
+
+
+        }
+
 
         //method fpr printing an array list
         public void printArray<T>(IEnumerable<T> a)
@@ -287,3 +373,37 @@ namespace HwrBerlin.HenryTasks
         }
     }
 }
+
+
+/*
+             for(int i =0; i<=medianList.Count()-1; i++){ 
+                Debug.WriteLine("Index: "+ i +" --> "+ medianList[i]);
+             }
+            for (int i = 100; i <= 200; i++)
+            {
+                Debug.WriteLine("Check-Method: Entering For Loop");
+                if(medianList.Count == 0){
+                    Debug.WriteLine(" Liste ist leer :(");
+                    //return drive;
+                }
+                else if (safety_threshold > medianList[i])
+                {
+                    // sets stop
+                    Debug.WriteLine("Aktueller Wert aus MedianListe "+medianList[i]);
+                    Debug.WriteLine("Aktueller Index aus MedianListe: "+i);
+                    //Debug.WriteLine("drive == false");
+                    drive = false;
+                    //return drive;
+                }
+                else if (safety_threshold <= medianList[i])
+                {
+                    //Debug.WriteLine("drive == true");
+                    drive = true;
+                    Debug.WriteLine("Aktueller Wert aus MedianListe "+medianList[i]);
+                    Debug.WriteLine("Aktueller Index aus MedianListe: "+i);
+                    //return drive;
+                }
+            }
+            Debug.WriteLine(drive.ToString());
+            return drive;
+     */

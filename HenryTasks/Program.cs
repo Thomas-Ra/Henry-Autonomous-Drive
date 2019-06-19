@@ -190,10 +190,11 @@ namespace HwrBerlin.HenryTasks
                         "'join' - less space between grippers",
                         "'task' - starts the task programm",
                         "'auto' - starts autodrive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
-                        "'testcorridor' - testing check2() Method, ",
-                        "'auto3' - starts autodrive",
-                        "'auto4' - starts autodrive",
-                        "'testauto' - starts testauto, no scanning, only sample data");
+                        "'testcorridor' - testing check2() Method, which is based on corridor calculation ",
+                        "'testauto4' - testing check() with safety_threshold",
+                        "'auto4' - starts autodrive based on default safety_threshold=700",
+                        "'testauto' - starts testauto, no scanning, only sample data",
+                        "'nice' - drives forward, if obstacle checks where to drive");
                 
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
@@ -218,28 +219,35 @@ namespace HwrBerlin.HenryTasks
                             }
                             break;
                         //case for testing the check2() Method in order to check the thresholdlist and comparison with medianlist
+
                         case "testcorridor":
                             Auto1 instanceAuto1_2 = new Auto1();
                             var thresholdlist = new List<double>();
                             thresholdlist = instanceAuto1_2.generateCorridorList();
+                            //checking thresholdlist
+                            /*for(int i =0; i<=thresholdlist.Count()-1; i++){
+                                  Debug.WriteLine("Nächste Stelle in der Thresholdliste = "+ thresholdlist[i]);
+                            }*/
+                            //checking check2() Method
+                            //instanceAuto1_2.Check2();
                             int forever = 1;
                             while (forever==1){
-                            instanceAuto1_2.Check2(thresholdlist);
+                            //instanceAuto1_2.Check2();
+                            instanceAuto1_2.Decide_basedonthresholdlist();
                             }
                             break;
 
                          //Case for just executing the Check()-Method and its output
-                        case "auto3":
+                        case "testauto4":
                             Auto1 instanceAuto = new Auto1();
                             int loop_infinitely = 1;
                             while (loop_infinitely == 1) {
                                 instanceAuto.Check();
                             }
-
                             break;
                             
                             //case for executing the output of the decide() Method in the class Auto1
-                            case "auto4":
+                        case "auto4":
                             //new instance of class Auto1
                             Auto1 instanceAuto2 = new Auto1();
                             //Looping the method call infinitifely
@@ -249,6 +257,20 @@ namespace HwrBerlin.HenryTasks
                                 instanceAuto2.Decide();
                             }
                             break;
+
+                         case "nice":
+
+                            Auto1 instanceAuto10 = new Auto1();
+
+                            while(true){
+
+                                instanceAuto10.driveLeftOrRight();
+                            }
+
+
+
+
+                                break;
 
                             //case for testing: utilizes the methods testListnoObstacle() , testListObstacle() , testCheck() from the class Auto1
                             case "testauto":
