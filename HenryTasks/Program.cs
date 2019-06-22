@@ -189,12 +189,14 @@ namespace HwrBerlin.HenryTasks
                         "'divide' - more space between grippers",
                         "'join' - less space between grippers",
                         "'task' - starts the task programm",
-                        "'auto' - starts autodrive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
+                        "'auto' - starts drive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
                         "'testcorridor' - testing check2() Method, which is based on corridor calculation ",
                         "'testauto4' - testing check() with safety_threshold",
                         "'auto4' - starts autodrive based on default safety_threshold=700",
                         "'testauto' - starts testauto, no scanning, only sample data",
-                        "'nice' - drives forward, if obstacle checks where to drive");
+                        "'forward' - MUST henry drives forward, if there is an obstacle he waits for it to go away",
+                        "'random' - CAN drives forward, if obstacle decides randomly where to drive",
+                        "'autodrive' - NICE drives forward, if obstacle checks where to drive");
                 
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
@@ -202,11 +204,7 @@ namespace HwrBerlin.HenryTasks
                     switch (inputArray[0])
                     {   
 
-                        /* Must-Haves:
-                         * auto represents our must haves, these include that Henry stops if a obstacle is
-                         * right infront of him and that he waits a certain amount of time. If the obstacle 
-                         * disappeared Henry moves forward 
-                        */
+
                         //
                         case "auto":
 
@@ -258,19 +256,57 @@ namespace HwrBerlin.HenryTasks
                             }
                             break;
 
-                         case "nice":
+
+                       /* Must-Haves:
+                         * auto represents our must haves, these include that Henry stops if a obstacle is
+                         * right infront of him and that he waits a certain amount of time. If the obstacle 
+                         * disappeared Henry moves forward 
+                        */
+                            case "forward":
+                                Auto1 instanceAuto1_20 = new Auto1();
+                                var thresholdlist_forward = new List<double>();
+                                thresholdlist_forward = instanceAuto1_20.generateCorridorList();
+                                //checking thresholdlist
+                                /*for(int i =0; i<=thresholdlist.Count()-1; i++){
+                                      Debug.WriteLine("Nächste Stelle in der Thresholdliste = "+ thresholdlist[i]);
+                                }*/
+                                //checking check2() Method
+                                //instanceAuto1_2.Check2();
+                                int z = 1;
+                                while (z == 1){
+                                     //instanceAuto1_2.Check2();
+                                     instanceAuto1_20.Decide_basedonthresholdlist();
+                                }
+                            break;
+
+                      /* Can Haves:
+                      * Henry drives forward. If he detects an obstacle he chooses randomly where to drive.
+                      */
+                         case "random":
 
                             Auto1 instanceAuto10 = new Auto1();
+                            int y = 1;
+                            while(y == 1){
 
-                            while(true){
-
-                                instanceAuto10.driveLeftOrRight();
+                                instanceAuto10.randomDriveLeftOrRight();
                             }
 
+                         break;
 
 
+                      /* Nice to haves:
+                       * Henry drives forward. If he detects an obstacle he chooses where to drive based on his scanning data.
+                       */
+                         case "autodrive":
 
-                                break;
+                            Auto1 instanceAuto20 = new Auto1();
+                            int k = 1;
+                            while(k == 1){
+
+                                instanceAuto20.driveLeftOrRight();
+                            }
+
+                         break;
 
                             //case for testing: utilizes the methods testListnoObstacle() , testListObstacle() , testCheck() from the class Auto1
                             case "testauto":
