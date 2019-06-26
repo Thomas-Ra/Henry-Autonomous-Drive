@@ -19,8 +19,8 @@ namespace HwrBerlin.HenryTasks
         public static Scanner _scanner = new Scanner();
         public static int velocity = 1;
         public static int safety_threshold = 600;
-                    // bei 1 dreht nach links, bei 2 dreht nach rechts
-            int rechts = 0;
+        // bei 1 dreht nach links, bei 2 dreht nach rechts
+        int rechts = 0;
 
         //METHODS FOR AUTONOMOUS DRIVING FUNCTIONALITY
 
@@ -136,7 +136,7 @@ namespace HwrBerlin.HenryTasks
         //needs checking for right calculation!
         public Boolean Check2()
         {
-            Debug.WriteLine("Entering Check2 Method");
+            //Debug.WriteLine("Entering Check2 Method");
             //set drive = false as default
             Boolean drive = false;
             //get medianlist via scan() method after declaration of local list
@@ -359,13 +359,19 @@ namespace HwrBerlin.HenryTasks
                 if(rechts == 0){
 
                     _robot.TurnInDegrees(leftFurthestIndex);
+                    // setzen rechts auf 1, um abzuspeichern, dass er sich vorher nach links gedreht hat
                     rechts = 1;
+                    Debug.WriteLine("Dreht nach links zum " + leftFurthestIndex);
+                    // wenn er sich vorher nach links gedreht hat, dreht er sich weiter nach links, um nicht in einen loop zu kommen
                 } else if (rechts == 1){
 
                     _robot.TurnInDegrees(30);
+                     Debug.WriteLine("Dreht nach links, hat sich gerade nach links gedreht, variable steht auf  " + rechts);
+                    // sollte er sich vorher nach rechts gedreht haben, dreht er sich wieder nach rechts
                 } else if (rechts == 2){
 
                     _robot.TurnInDegrees(-30);
+                    Debug.WriteLine("Dreht nach links, hat sich gerade nach rechts gedreht, variable steht auf  " + rechts);
                 }
                 
             // when there are more obstacles on the left side, henry turns right
@@ -373,14 +379,18 @@ namespace HwrBerlin.HenryTasks
 
                 if(rechts == 0){
 
-                    _robot.TurnInDegrees(leftFurthestIndex);
+                    _robot.TurnInDegrees(rightFurthestIndex);
                     rechts = 2;
+                    Debug.WriteLine("Dreht nach rechts zum " + rightFurthestIndex);
+
                 } else if (rechts == 1){
 
                     _robot.TurnInDegrees(30);
+                     Debug.WriteLine("Dreht nach rechts, hat sich gerade nach links gedreht, variable steht auf  " + rechts);
                 } else if (rechts == 2){
 
                     _robot.TurnInDegrees(-30);
+                    Debug.WriteLine("Dreht nach rechts, hat sich gerade nach rechts gedreht, variable steht auf  " + rechts);
                 }
 
             } else if ( right == left){
