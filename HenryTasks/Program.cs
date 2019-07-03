@@ -288,7 +288,7 @@ namespace HwrBerlin.HenryTasks
                             int y = 1;
                             while(y == 1){
 
-                                instanceAuto10.randomDriveLeftOrRight();
+                            instanceAuto10.randomDriveLeftOrRight();
                             }
 
                          break;
@@ -301,9 +301,8 @@ namespace HwrBerlin.HenryTasks
 
                             Auto1 instanceAuto20 = new Auto1();
                             int k = 1;
-                            while(k == 1){
-
-                                instanceAuto20.driveLeftOrRight();
+                            while(k == 1 ){
+                                instanceAuto20.driveLeftOrRight(); 
                             }
 
                          break;

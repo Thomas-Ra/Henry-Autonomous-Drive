@@ -37,16 +37,13 @@ namespace HwrBerlin.HenryTasks
                 {
                     if (e is IndexOutOfRangeException)
                     {
-
                         Debug.WriteLine(e.Message);
                         Debug.WriteLine("Länge MedianListe: "+ medianList.Count());
-                        //continue;
-                        //break;
                     }
                 }
             return medianList;
-
          }
+
         //2. CHECK
         //This method uses the output of the SCAN()-Method above as input
         //boolean method, returns the value allocated with the two robot-states: drive or stop
@@ -55,12 +52,11 @@ namespace HwrBerlin.HenryTasks
         //for the initial start of the robot and program, the boolsche variable is set to false in order to maintain a stop until the frist scan has been initited 
         public Boolean Check()
         {
-                /*for(int i =0; i<=medianList.Count()-1; i++){ 
-                Debug.WriteLine("Index: "+ i +" --> "+ medianList[i]);
-                 }*/
-                 var medianList = new List<int>();
+                var medianList = new List<int>();
+                //Calling scan() Method to retrieve MedianList
                  medianList= Scan();
                  Boolean drive = false;
+                //Checking the retrieved list between index of 100 and 200
                 for (int i = 100; i <= 200; i++)
                 {
                 Debug.WriteLine("Check-Method: Entering For Loop");
@@ -95,13 +91,14 @@ namespace HwrBerlin.HenryTasks
         {
             var thresholdlist = new List<double>();
             var reverseThresholdlist = new List<double>();
-            //Turning Radius of Robot = 44,35
-            // Adding an extra ten cm safety distance to the radius on both sides
+            //Turning Radius of Robot = 44,35 cm
+            // Adding an extra 10 cm safety distance to the radius on both sides
             //safety_radius=44,35 + 10 + 10 = 64.35 -> in MM = 643.5
             double safety_radius = 600;
-            //initializing of values for the corridor
+            //initializing the values for the corridor
             //adding the safety_radius itself as value for 0 degrees, as the calculation starts at 1 degree
             thresholdlist.Add(safety_radius);
+            //Calculation for values in list with index 1-90
             for (int i = 1; i <= 90; i++)
             {
                 double threshold =  safety_radius / Math.Cos((Math.PI * i / 180.0)) ;
@@ -115,18 +112,14 @@ namespace HwrBerlin.HenryTasks
             }
             //adding the value for the safety_threshold to the list for the respective 90 degrees
             thresholdlist.Add(safety_threshold);
+            //Adding values in list for index 90-179, the values are mirrowed from the first 89 entries in the same list
             for (int i = 179; i >= 90; i--)
             {
                 thresholdlist.Add(thresholdlist[i-89]);
             }
             ////adding the safety_radius itself as value for 181 degrees, same as for degree 0, respective Position 0 within the list
             thresholdlist.Add(thresholdlist[0]);
-
-            //reversing list
-            //reverseThresholdlist.Add(thresholdlist.Reverse().ToDouble());
-            // adding reversed list
-            //thresholdlist.Add(reverseThresholdlist);
-            //return the list
+            //Returning complete list of corridor-distances
             return thresholdlist;
         }
 
@@ -134,30 +127,34 @@ namespace HwrBerlin.HenryTasks
         //2 B) 
         //Implementation for the real threshold distances (variable, depending on degree)
         //needs checking for right calculation!
+        //This method implies a comparison between the actual scan data (i.e. medianList) and the thresholdlist (see method above for calculation)
         public Boolean Check2()
         {
-            //Debug.WriteLine("Entering Check2 Method");
-            //set drive = false as default
+            //set drive = false as default for each new entry into this method
             Boolean drive = false;
-            //get medianlist via scan() method after declaration of local list
+            //get medianlist via calling scan() method after declaration of local list
             List<int> medianList = new List<int>();
             medianList = Scan();
-            //get Thresholdlist via generateCorridor() Method
+            //get Thresholdlist via calling generateCorridor() Method after declaration of local list
             List<double> thresholdlist = new List<double>();
             thresholdlist = generateCorridorList();
-            //Check: compare values from thresholdlist with the values fro, the repsecrtive degree in medianlist
+            //Check: compare values from thresholdlist with the values from the repsecrtive degree in medianlist
+            //iterator for thresholdlist starting at index 0
             int i = 0;
+            //iterator for medianList starting at index 45
             int j = 45;
             while (i < thresholdlist.Count()-1 && j < medianList.Count()-1)
             {
-             /*   Debug.WriteLine("Aktueller Index Thresholdliste "+ i);
+             /*Further debugging output if needed, helpful for reverse engineering the decision making process in code concerning the boolean value for drive
+                Debug.WriteLine("Aktueller Index Thresholdliste "+ i);
                 Debug.WriteLine("Länge Thresholdliste= "+thresholdlist.Count());
                 Debug.WriteLine("Aktueller Index MedianListe "+j);
                 Debug.WriteLine("Länge MedianListe= "+ medianList.Count()); */
+
                 //Check Algorithm to set the boolean drive according to the output of comparison
                  if (thresholdlist[i] > medianList[j])
                 {
-                    // sets stop
+                 // sets stop
                  /*   Debug.WriteLine("Aktueller Index Thresholdliste "+ j);
                     Debug.WriteLine("Aktueller Index Medianliste "+ i);
                     Debug.WriteLine("Aktueller Wert aus MedianListe" + medianList[j]);
@@ -176,6 +173,7 @@ namespace HwrBerlin.HenryTasks
                 i++;
                 j++;
             }
+            //Return the previously set boolsche variable drive
             return drive;
         }
         //3. DECIDE
@@ -208,7 +206,7 @@ namespace HwrBerlin.HenryTasks
         }
 
         //3. DECIDE#2 (calling Check2())
-        //Based on the output value of the method CHECK(), this following method sets the robot into the repsective modus, either stop or drive
+        //Based on the output value of the method CHECK()2, this following method sets the robot into the repsective modus, either stop or drive
         public void Decide_basedonthresholdlist()
         {
             // velocity that henry drives
@@ -235,8 +233,6 @@ namespace HwrBerlin.HenryTasks
                 }
             }
         }
-
-         /// <summary>
          /// Generates random number. Based on the number he turns left or right.
          /// If random number is 1 Henry turns 45° to the left.
          /// If random number is 2 Henry turns 45° to the right.
@@ -251,11 +247,11 @@ namespace HwrBerlin.HenryTasks
             zufallszahl = rnd.Next(1, 3);
 
             if (zufallszahl == 1){
-
+                Debug.WriteLine("Turn left");
                 _robot.TurnInDegrees(45);
             }
             if (zufallszahl == 2){
-
+                 Debug.WriteLine("Turn right");
                 _robot.TurnInDegrees(-45);
             }
            
@@ -288,12 +284,8 @@ namespace HwrBerlin.HenryTasks
                     _robot.Move(drive_mode);
                 }
             }
-
-
         }
 
-
-        /// <summary>
         /// Decides where to move. Turns henry either a certain ammount of degrees left or right.
         /// </summary>
         public void checkLeftOrRight(){
@@ -308,10 +300,10 @@ namespace HwrBerlin.HenryTasks
             List<int> medianList = new List<int>();
             medianList = Scan();
 
-            //hier sind die rechten werte 
+            //Values for the right side (0 to 90 degrees, respective 46 to 136 degrees
             for(int i = 46; i <= 136; i++){
 
-                // searches for the furthest distance and its index.
+                // searches for the furthest distance and its index
                 if(rightDistance < medianList[i]){
                      
                     //only sets longest distance if it is longer than the safety threshold
@@ -320,7 +312,7 @@ namespace HwrBerlin.HenryTasks
                         rightDistance = medianList[i];
                         // saves the index from the longest distance to use it when Henry has to turn
                         rightFurthestIndex = i * -1;
-                        Debug.WriteLine("Längste Distanz rechts: " + leftDistance + " Gradzahl zum rechts drehen: " + leftFurthestIndex);
+                      Debug.WriteLine("Längste Distanz Rechts: " + rightDistance + " Gradzahl zum Rechts drehen: " + rightFurthestIndex);
                      }
                 }
 
@@ -330,7 +322,7 @@ namespace HwrBerlin.HenryTasks
                 }
             }
 
-            // hier ist links
+            // Values for Left side, degree 90 to 180, repsective 137 to 226
             for(int i = 137; i <= 226; i++){
 
                  // searches for the furthest distance and its index.
@@ -338,11 +330,11 @@ namespace HwrBerlin.HenryTasks
 
                     //only sets longest distance if it is longer than the safety threshold
                     if(medianList[i] > safety_threshold){
-                        // saves the furthest distance thus far. If there is a bigger one it saves them.
+                        // saves the furthest distance thus far. If there is a bigger one it saves that one instead.
                         leftDistance = medianList[i];
                         // saves the index from the longest distance to use it when Henry has to turn
                         leftFurthestIndex = i - 90;
-                        Debug.WriteLine("Längste Distanz links: " + rightDistance + " Gradzahl zum links drehen: " + rightFurthestIndex);
+                        Debug.WriteLine("Längste Distanz Links: " + leftDistance + " Gradzahl zum links drehen: " + leftFurthestIndex);
                     }
                 }
 
@@ -357,7 +349,6 @@ namespace HwrBerlin.HenryTasks
             if(right > left){
 
                 if(rechts == 0){
-
                     _robot.TurnInDegrees(leftFurthestIndex);
                     // setzen rechts auf 1, um abzuspeichern, dass er sich vorher nach links gedreht hat
                     rechts = 1;
@@ -437,8 +428,6 @@ namespace HwrBerlin.HenryTasks
                     _robot.Move(drive_mode);
                 }
             }
-
-
         }
 
 
@@ -475,32 +464,32 @@ namespace HwrBerlin.HenryTasks
             return filltestList2;
 
 }
+        //Method to check Logic, testlists with fake data are utilized. This method has a list as parameter
+        //The above methods for testlists will be called first, so as to call the below method afterwards including the generated list as parameter
         public Boolean testCheck(List<int> testList)
         {
-            //_robot = new Robot();
-            //_scanner = new Scanner();
             Boolean drive = false;
-
+            //Checking the lists values from index 100 to 200
             for (int i = 100; i <= 200; i++)
             {
                 if(testList.Count == 0){
                     Debug.WriteLine(" Liste ist leer :(");
                     continue;
                 }
+                //Safety Threshold is bigger than the value in the testlist --> onstacle
                 if (safety_threshold > testList[i])
                 {
                     // sets stop
                     Debug.WriteLine(testList[i]);
                     Debug.WriteLine("drive == false");
                     drive = false;
-                    return drive;
                 }
+                //Safety Threshold is smaller or equal than the value in the testlist --> no onstacle
                 else if (safety_threshold <= testList[i])
                 {
                     Debug.WriteLine("drive == true");
                     drive = true;
                     Debug.WriteLine(testList[i]);
-                    //printArray(medianList);
                     return drive;
                 }
             }
@@ -509,36 +498,3 @@ namespace HwrBerlin.HenryTasks
     }
 }
 
-
-/*
-             for(int i =0; i<=medianList.Count()-1; i++){ 
-                Debug.WriteLine("Index: "+ i +" --> "+ medianList[i]);
-             }
-            for (int i = 100; i <= 200; i++)
-            {
-                Debug.WriteLine("Check-Method: Entering For Loop");
-                if(medianList.Count == 0){
-                    Debug.WriteLine(" Liste ist leer :(");
-                    //return drive;
-                }
-                else if (safety_threshold > medianList[i])
-                {
-                    // sets stop
-                    Debug.WriteLine("Aktueller Wert aus MedianListe "+medianList[i]);
-                    Debug.WriteLine("Aktueller Index aus MedianListe: "+i);
-                    //Debug.WriteLine("drive == false");
-                    drive = false;
-                    //return drive;
-                }
-                else if (safety_threshold <= medianList[i])
-                {
-                    //Debug.WriteLine("drive == true");
-                    drive = true;
-                    Debug.WriteLine("Aktueller Wert aus MedianListe "+medianList[i]);
-                    Debug.WriteLine("Aktueller Index aus MedianListe: "+i);
-                    //return drive;
-                }
-            }
-            Debug.WriteLine(drive.ToString());
-            return drive;
-     */
