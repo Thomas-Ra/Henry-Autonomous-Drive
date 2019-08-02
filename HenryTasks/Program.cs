@@ -189,11 +189,13 @@ namespace HwrBerlin.HenryTasks
                         "'divide' - more space between grippers",
                         "'join' - less space between grippers",
                         "'task' - starts the task programm",
+                        /*
                         "'auto' - starts drive, henry drives forward and stops if a obstacle is in front of him and waits a given ammount of time",
                         "'testcorridor' - testing check2() Method, which is based on corridor calculation ",
                         "'testauto4' - testing check() with safety_threshold",
                         "'auto4' - starts autodrive based on default safety_threshold=700",
-                        "'testauto' - starts testauto, no scanning, only sample data",
+                        "'testauto' - starts testauto, no scanning, only sample data", 
+                        */
                         "'forward' - MUST henry drives forward, if there is an obstacle he waits for it to go away",
                         "'random' - CAN drives forward, if obstacle decides randomly where to drive",
                         "'autodrive' - NICE drives forward, if obstacle checks where to drive");
@@ -204,7 +206,7 @@ namespace HwrBerlin.HenryTasks
                     switch (inputArray[0])
                     {   
 
-
+                    /*
                         //
                         case "auto":
 
@@ -220,12 +222,12 @@ namespace HwrBerlin.HenryTasks
 
                         case "testcorridor":
                             Auto1 instanceAuto1_2 = new Auto1();
-                            var thresholdlist = new List<double>();
-                            thresholdlist = instanceAuto1_2.generateCorridorList();
+                            //var thresholdlist = new List<double>();
+                            //thresholdlist = instanceAuto1_2.generateCorridorList();
                             //checking thresholdlist
-                            /*for(int i =0; i<=thresholdlist.Count()-1; i++){
-                                  Debug.WriteLine("Nächste Stelle in der Thresholdliste = "+ thresholdlist[i]);
-                            }*/
+                            //for(int i =0; i<=thresholdlist.Count()-1; i++){
+                            //      Debug.WriteLine("Nächste Stelle in der Thresholdliste = "+ thresholdlist[i]);
+                            // }
                             //checking check2() Method
                             //instanceAuto1_2.Check2();
                             int forever = 1;
@@ -235,78 +237,74 @@ namespace HwrBerlin.HenryTasks
                             }
                             break;
 
-                         //Case for just executing the Check()-Method and its output
+                        // Case for just executing the Check()-Method and its output
                         case "testauto4":
+
                             Auto1 instanceAuto = new Auto1();
                             int loop_infinitely = 1;
-                            while (loop_infinitely == 1) {
+
+                            while (loop_infinitely == 1) 
+                            {
                                 instanceAuto.Check();
                             }
+
                             break;
-                            
-                            //case for executing the output of the decide() Method in the class Auto1
+    
+                        // case for executing the output of the decide() Method in the class Auto1
                         case "auto4":
-                            //new instance of class Auto1
+
+                            // new instance of class Auto1
                             Auto1 instanceAuto2 = new Auto1();
-                            //Looping the method call infinitifely
-                            int infinity = 1;
-                            while (infinity == 1) {
-                                //Calling the Method
+
+                            // Looping the method call infinitifely
+                            while (true) 
+                            {
+                                // Calling the Method
                                 instanceAuto2.Decide();
                             }
                             break;
+                    */
 
-
-                       /* Must-Haves:
-                         * auto represents our must haves, these include that Henry stops if a obstacle is
-                         * right infront of him and that he waits a certain amount of time. If the obstacle 
-                         * disappeared Henry moves forward 
-                        */
+                        /// Must-Haves:
+                        /// auto represents our must haves, these include that Henry stops if a obstacle is
+                        /// right infront of him and that he waits a certain amount of time. If the obstacle 
+                        /// disappeared Henry moves forward 
                             case "forward":
+
                                 Auto1 instanceAuto1_20 = new Auto1();
-                                var thresholdlist_forward = new List<double>();
-                                thresholdlist_forward = instanceAuto1_20.generateCorridorList();
-                                //checking thresholdlist
-                                /*for(int i =0; i<=thresholdlist.Count()-1; i++){
-                                      Debug.WriteLine("Nächste Stelle in der Thresholdliste = "+ thresholdlist[i]);
-                                }*/
-                                //checking check2() Method
-                                //instanceAuto1_2.Check2();
-                                int z = 1;
-                                while (z == 1){
-                                     //instanceAuto1_2.Check2();
+
+                                while (true)
+                                {
                                      instanceAuto1_20.Decide_basedonthresholdlist();
                                 }
                             break;
 
-                      /* Can Haves:
-                      * Henry drives forward. If he detects an obstacle he chooses randomly where to drive.
-                      */
+                      /// Can Haves:
+                      /// Henry drives forward. If he detects an obstacle he chooses randomly where to drive.
                          case "random":
 
                             Auto1 instanceAuto10 = new Auto1();
-                            int y = 1;
-                            while(y == 1){
-
-                            instanceAuto10.randomDriveLeftOrRight();
+                            while(true)
+                            {
+                                instanceAuto10.randomDriveLeftOrRight();
                             }
 
                          break;
 
-
-                      /* Nice to haves:
-                       * Henry drives forward. If he detects an obstacle he chooses where to drive based on his scanning data.
-                       */
+                      /// Nice to haves:
+                      /// Henry drives forward. If he detects an obstacle he chooses where to drive based on his scanning data.
                          case "autodrive":
 
                             Auto1 instanceAuto20 = new Auto1();
-                            int k = 1;
-                            while(k == 1 ){
+
+                            while(true)
+                            {
                                 instanceAuto20.driveLeftOrRight(); 
                             }
 
                          break;
 
+                    /*
                             //case for testing: utilizes the methods testListnoObstacle() , testListObstacle() , testCheck() from the class Auto1
                             case "testauto":
                             //create INstanz of class Auto1
@@ -358,6 +356,8 @@ namespace HwrBerlin.HenryTasks
                                 }  
                             }
                              break;
+
+                    */
 
                         case "stop":
                             _robot.StopImmediately();
