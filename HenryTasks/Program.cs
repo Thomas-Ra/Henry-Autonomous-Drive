@@ -8,17 +8,13 @@ using static HwrBerlin.Bot.Engines.Robot;
 using HwrBerlin.Bot.Scanner;
 using System.Linq;
 
-
 namespace HwrBerlin.HenryTasks
-
 
 {
      internal class Program : AutoDriveProgramHT
     {
         private static Scanner _scanner;
-        /// <summary>
-        /// user can press keys for four directions
-        /// </summary>
+        
         private enum Direction
         {
             Up,
@@ -27,10 +23,12 @@ namespace HwrBerlin.HenryTasks
             Left
         }
 
-
         private readonly Robot _robot = new Robot();
         private readonly Arm _arm = new Arm();
-
+        
+        /// <summary>
+        /// Main method. The main method only calls the Start() Method in which we controll what method shall be executed.
+        /// </summary>
         private static void Main()
         {
             var program = new Program();
@@ -38,8 +36,10 @@ namespace HwrBerlin.HenryTasks
             program.Start();
         }
 
-
-        //method fpr printing an array list
+        /// <summary>
+        /// Method for printing an array list in the debug command line.
+        /// </summary>
+        /// <param name="a"> Array that you want to be printed. </param>
         public void printArray<T>(IEnumerable<T> a)
         {
             foreach (var i in a)
@@ -48,32 +48,10 @@ namespace HwrBerlin.HenryTasks
             }
         }
 
-        /*
-         * Scant den Bereich vor ihm
-         * Gibt true zurück, wenn etwas vor ihm ist
-         * Gibt false zurück, wenn nichts vor ihm ist
-         */
-        public Boolean scanForObstacles(int treshold, List<int> medianList)
-        {
-
-            for (int i = 100; i <= 200; i++)
-            {
-                // checks every degree right infront of henry (100° angle)
-                // if treshold is greater than any degree distance henry stops
-                if (treshold > medianList[i])
-                {
-                    // sets stop 
-                    return true;
-
-                }
-
-            }
-
-            return false;
-
-        }
-
-
+        /// <summary>
+        /// Allows us to control the robot with the direction keys on the keybord. Also gives visual feedback in which direction the robot currently turns
+        /// and at which velocity. 
+        /// </summary>
         private void CurrentMode(WalkMode walkMode, TurnMode turnMode)
         {
             switch (walkMode)
@@ -167,7 +145,11 @@ namespace HwrBerlin.HenryTasks
                     break;
             }
         }
-
+        
+        /// <summary>
+        /// In the Start() method we can call all the different methods which shall be executed by the robot. This happens via a new 
+        /// console window which allows input and also shows the possible inputs with a explanation.
+        /// </summary>
         public void Start()
         {
             _robot.Enable();
@@ -194,20 +176,57 @@ namespace HwrBerlin.HenryTasks
                         "'testcorridor' - testing check2() Method, which is based on corridor calculation ",
                         "'testauto4' - testing check() with safety_threshold",
                         "'auto4' - starts autodrive based on default safety_threshold=700",
-                        "'testauto' - starts testauto, no scanning, only sample data", 
                         */
                         "'forward' - MUST henry drives forward, if there is an obstacle he waits for it to go away",
-                        "'random' - CAN drives forward, if obstacle decides randomly where to drive",
-                        "'autodrive' - NICE drives forward, if obstacle checks where to drive");
+                        "'random' - CAN CAN Have - drives forward, if there is an obstacle the robot decides randomly where to drive",
+                        "'autodrive' - NICE to Have - drives forward, if there is an obstacle the robot checks where to drive");
                 
                     consoleInput = Console.ReadLine();
                     consoleInput = consoleInput.Trim();
                     var inputArray = consoleInput.Split(' ');
                     switch (inputArray[0])
                     {   
+                        /// Must-Haves:
+                        /// auto represents our must haves, these include that Henry stops if a obstacle is
+                        /// right infront of him and that he waits a certain amount of time. If the obstacle 
+                        /// disappeared Henry moves forward 
+                            case "forward":
 
-                    /*
-                        //
+                                Auto1 instanceAuto1_20 = new Auto1();
+
+                                while (true)
+                                {
+                                     instanceAuto1_20.Decide_basedonthresholdlist();
+                                }
+                            break;
+
+                      /// Can Haves:
+                      /// Henry drives forward. If he detects an obstacle he chooses randomly where to drive.
+                         case "random":
+
+                            Auto1 instanceAuto10 = new Auto1();
+                            while(true)
+                            {
+                                instanceAuto10.randomDriveLeftOrRight();
+                            }
+
+                         break;
+
+                      /// Nice to haves:
+                      /// Henry drives forward. If he detects an obstacle he chooses where to drive based on his scanning data.
+                         case "autodrive":
+
+                            Auto1 instanceAuto20 = new Auto1();
+
+                            while(true)
+                            {
+                                instanceAuto20.driveLeftOrRight(); 
+                            }
+
+                         break;
+                         
+                         
+                      /*
                         case "auto":
 
                             Auto1 instanceAuto_1 = new Auto1();
@@ -264,101 +283,6 @@ namespace HwrBerlin.HenryTasks
                             }
                             break;
                     */
-
-                        /// Must-Haves:
-                        /// auto represents our must haves, these include that Henry stops if a obstacle is
-                        /// right infront of him and that he waits a certain amount of time. If the obstacle 
-                        /// disappeared Henry moves forward 
-                            case "forward":
-
-                                Auto1 instanceAuto1_20 = new Auto1();
-
-                                while (true)
-                                {
-                                     instanceAuto1_20.Decide_basedonthresholdlist();
-                                }
-                            break;
-
-                      /// Can Haves:
-                      /// Henry drives forward. If he detects an obstacle he chooses randomly where to drive.
-                         case "random":
-
-                            Auto1 instanceAuto10 = new Auto1();
-                            while(true)
-                            {
-                                instanceAuto10.randomDriveLeftOrRight();
-                            }
-
-                         break;
-
-                      /// Nice to haves:
-                      /// Henry drives forward. If he detects an obstacle he chooses where to drive based on his scanning data.
-                         case "autodrive":
-
-                            Auto1 instanceAuto20 = new Auto1();
-
-                            while(true)
-                            {
-                                instanceAuto20.driveLeftOrRight(); 
-                            }
-
-                         break;
-
-                    /*
-                            //case for testing: utilizes the methods testListnoObstacle() , testListObstacle() , testCheck() from the class Auto1
-                            case "testauto":
-                            //create INstanz of class Auto1
-                            Auto1 instanceAuto5 = new Auto1();
-                            //initialize four lists
-                            var list1= new List<int>();
-                            var list2= new List<int>();
-                            var list3= new List<int>();
-                            var list4= new List<int>();
-                            //set the initilized lists with the methods testListnoObstacle() and testListIbstacle()
-                            //two lists with values > safety_threshold --> lists that do not contain obstacles
-                            //two lists with values < safety_threshold --> lists that do contain obstacles
-                            list1=instanceAuto5.testListnoObstacle();
-                            list2=instanceAuto5.testListObstacle();
-                            list3=instanceAuto5.testListnoObstacle();
-                            list4=instanceAuto5.testListObstacle();
-                            //Output for Debugger
-                            Debug.WriteLine("Liste 1 Länge: "+ list1.Count());
-                            Debug.WriteLine("Liste 2 Länge: "+ list2.Count());
-                            Debug.WriteLine("Liste 3 Länge: "+ list3.Count());
-                            Debug.WriteLine("Liste 4 Länge: "+ list4.Count());
-                            //Output for Debugger
-                            Debug.WriteLine("liste1: "+ list1.ToString());
-                            Debug.WriteLine("liste2: "+ list2.ToString());
-                            Debug.WriteLine("liste3: "+ list3.ToString());
-                            Debug.WriteLine("liste4: "+ list4.ToString());
-                            //Looping the program infititely, exit via closing the window
-                            int nevereverEnding = 1;
-                            while (nevereverEnding == 1) {
-
-                                //Test runs through with 10 iterations for each for loop
-                                //each for loop checks the allocated list through with the testCheck() - Method
-                                //further output for debugging is directly coded within the testCheck()- Method
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    instanceAuto5.testCheck(list1);
-                                }
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    instanceAuto5.testCheck(list2);
-                                }
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    instanceAuto5.testCheck(list3);
-                                }
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    instanceAuto5.testCheck(list4);
-                                }  
-                            }
-                             break;
-
-                    */
-
                         case "stop":
                             _robot.StopImmediately();
                             break;
