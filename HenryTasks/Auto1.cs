@@ -14,7 +14,7 @@ namespace HwrBerlin.HenryTasks
 {
     public class Auto1
     {
-        // Initializing objects and variables:
+        // initializing objects and variables:
         public static Robot _robot = new Robot();
         public static Scanner _scanner = new Scanner();
         // velocity is in km/h
@@ -22,19 +22,17 @@ namespace HwrBerlin.HenryTasks
         // threshold is in mm
         public static int safety_threshold = 700;
 
-        // turns left if 1 and right if the value is 2
+        // turns left if the value is 1 and right if the value is 2
+        // used in checkLeftOrRight() and set/reset to zero again in driveLeftOrRight() 
         int twiddle = 0;
 
-        // METHODS FOR AUTONOMOUS DRIVING FUNCTIONALITY
-
         /// <summary>
-        /// 1. SCAN
-        /// this method utilizes the class scanner.cs directly by calling on  the methods GetDataList() as well as MedianFilter()
-        /// The try-catch block aids in case the received list from those called methods has a lenght of 0
+        /// This method utilizes the class scanner.cs directly by calling on the methods GetDataList() as well as MedianFilter().
+        /// The try-catch block aids in case the received list from those called methods has a lenght of 0, i.e. when the scanner port is blocked.
         /// </summary>
+        /// <returns> Returns a list of distances from the scanner. Scanning errors will be corrected via the use of the median correction. </returns>
         public List<int> Scan()
         {
-
             // initialize local medianList
             var medianList = new List<int>();
 
@@ -54,23 +52,24 @@ namespace HwrBerlin.HenryTasks
          }
 
         /// <summary>
-        /// 2. CHECK
-        /// This method uses the output of the SCAN()-Method above as input
-        /// boolean method, returns the value allocated with the two robot-states: drive or stop
-        /// if no obstacle occurs within the defined range, the boolean drive is set to true 
-        /// if an obstacle occurs within the defined range, the boolean drive is set to false
-        /// for the initial start of the robot and program, the boolsche variable is set to false in order to maintain a stop until the frist scan has been initited 
+        /// This method uses the output of the Scan()-Method (MedianList) as input.
+        /// Boolean method, returns the value allocated with the two robot-states: either drive or stop.
+        /// If no obstacle occurs within the defined range, the boolean drive is set to true.
+        /// If an obstacle occurs within the defined range, the boolean drive is set to false.
+        /// For the initial start of the robot and program, the boolean variable is set to false in order to maintain a stop until the frist scan has been initiated.
         /// </summary>
+        /// <returns> Returns the boolean variable drive. True means there is no obstacle. The robot can safely frive forward. 
+        /// False means there is an obstacle so the robot has to stop immediately. </returns>
         public Boolean Check()
         {
             var medianList = new List<int>();
 
-            // Calling scan() Method to retrieve MedianList
-            medianList= Scan();
+            // calling Scan() method to retrieve the medianList
+            medianList = Scan();
 
             Boolean drive = false;
 
-            // Checking the retrieved list between index of 100 and 200
+            // Checking the retrieved list between index of 100 and 200 -> the area infront of the robot
             for (int i = 100; i <= 200; i++)
             {
                 Debug.WriteLine("Check-Method: Entering For Loop");
@@ -85,6 +84,7 @@ namespace HwrBerlin.HenryTasks
                     Debug.WriteLine("current value from medianList: " + medianList[i]);
                     Debug.WriteLine("current index from medianList: " + i);
                     Debug.WriteLine("drive == false");
+                    
                     drive = false;
                     return drive;
                 }
@@ -93,6 +93,7 @@ namespace HwrBerlin.HenryTasks
                     Debug.WriteLine("drive == true");
                     Debug.WriteLine("current value from medianList: " + medianList[i]);
                     Debug.WriteLine("current index from medianList: " + i);
+                    
                     drive = true;
                 }
             }
@@ -101,23 +102,24 @@ namespace HwrBerlin.HenryTasks
         }
 
         /// <summary>
-        /// getting a list with 181 values for a corridor
+        /// Getting a list with 181 values for a safe corridor. In this corridor the robot can safely turn around.
         /// </summary>
+        /// <returns> Returns a double array list with values in which the robot can safely move. </returns>
         public List<double> generateCorridorList()
         {
             var thresholdlist = new List<double>();
             var reverseThresholdlist = new List<double>();
 
-            // Turning Radius of Robot = 44,35 cm
-            // Adding an extra 10 cm safety distance to the radius on both sides
-            // safety_radius = 44,35 + 10 + 10 = 64.35 -> in MM = 643.5
+            // turning radius of the Robot = 44,35 cm
+            // adding an extra 10 cm safety distance to the radius on both sides
+            // safety_radius = 44,35cm + 10cm + 10cm = 64.35cm -> in MM = 643.5mm
             double safety_radius = 600;
 
             // initializing the values for the corridor
             // adding the safety_radius itself as value for 0 degrees, as the calculation starts at 1 degree
             thresholdlist.Add(safety_radius);
 
-            // Calculation for values in list with index 1-90
+            // calculation for values in list with index 1-90
             for (int i = 1; i <= 90; i++)
             {
                 double threshold =  safety_radius / Math.Cos((Math.PI * i / 180.0)) ;
@@ -133,53 +135,54 @@ namespace HwrBerlin.HenryTasks
             // adding the value for the safety_threshold to the list for the respective 90 degrees
             thresholdlist.Add(safety_threshold);
 
-            // Adding values in list for index 90-179, the values are mirrowed from the first 89 entries in the same list
+            // adding values in list for index 90-179, the values are mirrowed from the first 89 entries in the same list
             for (int i = 179; i >= 90; i--)
             {
                 thresholdlist.Add(thresholdlist[i-89]);
             }
-            // adding the safety_radius itself as value for 181 degrees, same as for degree 0, respective Position 0 within the list
+            // adding the safety_radius itself as value for 181 degrees, same as for degree 0, respective position 0 within the list
             thresholdlist.Add(thresholdlist[0]);
 
-            // Returning complete list of corridor-distances
+            // returning complete list of corridor-distances
             return thresholdlist;
         }
 
         /// <summary>
-        /// 2 B) 
-        /// Implementation for the real threshold distances (variable, depending on degree)
-        /// needs checking for right calculation!
-        /// This method implies a comparison between the actual scan data (i.e. medianList) and the thresholdlist (see method above for calculation)
+        /// Implementation for the real threshold distances (thresholds depending on degree).
+        /// This method does a comparison between the scan data (i.e. medianList) and the thresholdlist (see method generateCorridorList()).
         /// </summary>
+        /// <returns> Returns the boolean variable drive. True means there is no obstacle in our defined safe corridor. 
+        /// The robot can safely frive forward and turn around. False means there is an obstacle in the corridor, so the robot has to stop 
+        /// immediately and can not safely turn. </returns>
         public Boolean Check2()
         {
             // set drive = false as default for each new entry into this method
             Boolean drive = false;
 
-            // get medianlist via calling scan() method after declaration of local list
+            // get medianlist via calling Scan() method after declaration of local list
             List<int> medianList = new List<int>();
             medianList = Scan();
 
-            // get Thresholdlist via calling generateCorridor() Method after declaration of local list
+            // get thresholdlist via calling generateCorridorList() Method after the declaration of the local list
             List<double> thresholdlist = new List<double>();
             thresholdlist = generateCorridorList();
 
-            // Check: compare values from thresholdlist with the values from the repsecrtive degree in medianlist
+            // check comparison: compare the values from thresholdlist with the values from the respective degree in the medianlist
             // iterator for thresholdlist starting at index 0
             int i = 0;
 
-            // iterator for medianList starting at index 45
+            // iterator for medianList starting at index 45 (we ignore the first 45 values, because the robot sees itself in them)
             int j = 45;
 
             while (i < thresholdlist.Count()-1 && j < medianList.Count()-1)
             {
-             /* Further debugging output if needed, helpful for reverse engineering the decision making process in code concerning the boolean value for drive
+             /* Further debugging output if needed, helpful for reverse engineering the decision making process in the code concerning the boolean value for drive
                 Debug.WriteLine("current index thresholdlist: "+ i);
                 Debug.WriteLine("lenght of thresholdlist: " + thresholdlist.Count());
                 Debug.WriteLine("current index medianList: " + j);
                 Debug.WriteLine("length of medianList: " + medianList.Count()); */
 
-                // Check Algorithm to set the boolean drive according to the output of comparison
+                // the Check comparison algorithm to set the boolean drive according to the output of comparison
                  if (thresholdlist[i] > medianList[j])
                 {
                  // sets stop
@@ -202,13 +205,14 @@ namespace HwrBerlin.HenryTasks
                 i++;
                 j++;
             }
-            // Return the previously set boolsche variable drive
+            // Return the previously set boolean variable drive
             return drive;
         }
 
         /// <summary>
-        /// 3. DECIDE
-        /// Based on the output value of the method CHECK(), this following method sets the robot into the repsective modus, either stop or drive
+        /// Based on the output value of the method Check(), this following method sets the robot into the respective driving mode, either stop or drive.
+        /// However this method is only suitable for deciding if the robot has to stop or if he can drive. E.g. if an obstacle is in front of him.
+        /// This method can not guarantee, that he can safely turn! For this use the method Decide_basedonthresholdlist().
         /// </summary>
         public void Decide()
         {
@@ -220,7 +224,7 @@ namespace HwrBerlin.HenryTasks
             _robot.Enable();
             if (_robot != null && _robot.Enable())
             {
-                // Calling the method Check() to allocate the boolsche value correctly from the scan data
+                // calling the method Check() to allocate the boolean value correctly from the scan data
                 Boolean drive = Check();
 
                 // setting the robot into the repsective velocity according to the above input from the method call
@@ -232,15 +236,15 @@ namespace HwrBerlin.HenryTasks
                 }
                 else if (drive == true)
                 {
-                    // sets velocity to 1 so that henry drives
+                    // sets velocity to 1 so that Henry drives
                     _robot.Move(drive_mode);
                 }
             }
         }
 
         /// <summary>
-        /// 3. DECIDE#2 (calling Check2())
-        /// Based on the output value of the method CHECK()2, this following method sets the robot into the repsective modus, either stop or drive
+        /// Based on the output value of the method Check2(), this following method sets the robot into the respective driving mode, either stop or drive.
+        /// This method also makes sure, that the robot will stop if there is an obstacle in the safety corridor. Meaning that he can always safely turn around.
         /// </summary>
         public void Decide_basedonthresholdlist()
         {
@@ -252,7 +256,7 @@ namespace HwrBerlin.HenryTasks
             _robot.Enable();
             if (_robot != null && _robot.Enable())
             {
-                // Calling the method Check2() to allocate the boolsche value correctly from the scan data
+                // calling the method Check2() to allocate the boolsche value correctly from the scan data
                 Boolean drive = Check2();
 
                 // setting the robot into the repsective velocity according to the above input from the method call
@@ -264,20 +268,19 @@ namespace HwrBerlin.HenryTasks
                 }
                 if (drive == true)
                 {
-                    // sets velocity to 1 so that henry drives
+                    // sets velocity to 1 so that Henry drives
                     _robot.Move(drive_mode);
                 }
             }
         }
 
          /// <summary>
-         /// Generates random number. Based on the number he turns left or right.
-         /// If random number is 1 Henry turns 45° to the left.
-         /// If random number is 2 Henry turns 45° to the right.
+         /// Generates a random number. Based on the number he either turns left or right.
+         /// If the random number is 1 Henry turns 45° to the left.
+         /// If the random number is 2 Henry turns 45° to the right.
          /// </summary>
         public void randomLeftOrRight()
         {
-
             Random rnd = new Random();
 
             int random = 0;
@@ -298,19 +301,18 @@ namespace HwrBerlin.HenryTasks
         }
 
         /// <summary>
-        /// drives forward as long as there is room. If there is an obstacle the method 
-        /// randomLeftOrRight is called
+        /// Henry drives forward as long as there is space. If there is an obstacle in front of him or in his safety corridor the method 
+        /// randomLeftOrRight() is called to turn him randomly.
         /// </summary>
         public void randomDriveLeftOrRight()
         {
-
             int drive_mode = 1;
             int stop_mode = 0;
 
             _robot.Enable();
             if (_robot != null && _robot.Enable())
             {
-                // Calling the method Check2() to allocate the boolsche value correctly from the scan data
+                // calling the method Check2() to allocate the boolean value correctly from the scan data
                 Boolean drive = Check2();
 
                 // setting the robot into the repsective velocity according to the above input from the method call
@@ -323,18 +325,20 @@ namespace HwrBerlin.HenryTasks
                 }
                 else if (drive == true)
                 {
-                    // sets velocity to 1 so that henry drives
+                    // sets velocity to 1 so that Henry drives
                     _robot.Move(drive_mode);
                 }
             }
         }
 
         /// <summary>
-        /// Decides where to move. Turns henry either a certain ammount of degrees left or right.
+        /// Decides where to move based on the scanner data. The area in front of him that the scanner sees is divided into two 90 degree areas.
+        /// He turns in the direction with less obstacles and aligns itself with the degree that has the furthest distance.
+        /// We also make sure that he has to turn in one direction as long as he cannot drive forward. With this we make sure that he cannot 
+        /// get stuck in a loop on certain occasions.
         /// </summary>
         public void checkLeftOrRight()
         {
-
             int left = 0;
             int leftDistance = 0;
             int leftFurthestIndex = 0;
@@ -346,7 +350,7 @@ namespace HwrBerlin.HenryTasks
             List<int> medianList = new List<int>();
             medianList = Scan();
 
-            // Values for the right side (0 to 90 degrees, respective 46 to 136 degrees
+            // values for the right side (0 to 90 degrees, respective 46 to 136 degrees)
             for(int i = 46; i <= 136; i++)
             {
 
@@ -360,7 +364,7 @@ namespace HwrBerlin.HenryTasks
                         rightDistance = medianList[i];
                         // saves the index from the longest distance to use it when Henry has to turn, *-1 needs to be negative to turn right
                         rightFurthestIndex = i * -1;
-                      Debug.WriteLine("longest distance right: " + rightDistance + " degree to turn right " + rightFurthestIndex);
+                        Debug.WriteLine("longest distance right: " + rightDistance + " degree to turn right " + rightFurthestIndex);
                      }
                 }
 
@@ -371,7 +375,7 @@ namespace HwrBerlin.HenryTasks
                 }
             }
 
-            // Values for Left side, degree 90 to 180, repsective 137 to 226
+            // values for left side (90 to 180 degrees, respective 137 to 226)
             for(int i = 137; i <= 226; i++)
             {
 
@@ -416,7 +420,7 @@ namespace HwrBerlin.HenryTasks
                     _robot.TurnInDegrees(30);
                      Debug.WriteLine("turns to the left, because he turned left before. Value of twiddle: " + twiddle);
 
-                  // if he has turned to the right before he has to turn further to the right
+                  // if he has turned to the right before he has to turn further to the right to not get stuck in a loop
                 } else if (twiddle == 2)
                 {
                     _robot.TurnInDegrees(-30);
@@ -462,8 +466,8 @@ namespace HwrBerlin.HenryTasks
         }
 
         /// <summary>
-        /// Henry drives forward. If there is an obstacle he calls the checkLeftOrRight Method to check where to
-        /// turn and drives forward again.
+        /// Henry drives forward. If there is an obstacle he calls the checkLeftOrRight() method to check where he has to
+        /// turn in ordner to drive forward again.
         /// </summary>
         public void driveLeftOrRight()
         {
@@ -473,10 +477,10 @@ namespace HwrBerlin.HenryTasks
             _robot.Enable();
             if (_robot != null && _robot.Enable())
             {
-                // Calling the method Check2() to allocate the boolsche value correctly from the scan data
+                // calling the method Check2() to allocate the boolean value correctly from the scan data
                 Boolean drive = Check2();
 
-                // setting the robot into the repsective velocity according to the above input from the method call
+                // setting the robot into the respective velocity according to the above input from the method call
                 if (drive == false)
                 {
                     // sets velocity to zero so that Henry stops
@@ -487,15 +491,16 @@ namespace HwrBerlin.HenryTasks
                 else if (drive == true)
                 {
                     twiddle = 0;
-                    // sets velocity to 1 so that henry drives
+                    // sets velocity to 1 so that Henry drives
                     _robot.Move(drive_mode);
                 }
             }
         }
 
         /// <summary>
-        /// method fpr printing an array list
+        /// Method for printing an array list in the debug command line.
         /// </summary>
+        /// <param name="a"> Array that you want to be printed. </param>
         public void printArray<T>(IEnumerable<T> a)
         {
             foreach (var i in a)
@@ -505,17 +510,17 @@ namespace HwrBerlin.HenryTasks
         }
 
         /// <summary>
-        /// 4. TEST
-        /// The following methods have been implemented in order to test the logik and structure of the above methods
-        /// fake lists are beeing created within the methods testListnoObstacle() and testlistObstacle()
-        /// fake list with values > safety_threshold, no obstacles
+        /// The following methods have been implemented in order to test the logic and structure of the above methods.
+        /// Fake lists are beeing created within the methods testListnoObstacle() and testlistObstacle().
+        /// Fake list with values > safety_threshold, no obstacles.
         /// </summary>
-        public List<int> testListnoObstacle ()
+        /// <returns> Returns a filled list of the length 270 with the values of the safety threshold.</returns>
+        public List<int> testListnoObstacle()
         {
 
             var filltestList = new List<int>();
 
-            for(int i =0; i<=270;i++)
+            for(int i =0; i <= 270; i++)
             {
                 filltestList.Add(safety_threshold);
             }
@@ -524,27 +529,32 @@ namespace HwrBerlin.HenryTasks
         }
 
         /// <summary>
-        /// fake list with values < safety_threshold, obstacles are implied
+        /// Generates a fake list where the values are smaller than the safety_threshold. So that the list is full of obstacles for the logic.
         /// </summary>
-        public List<int> testListObstacle ()
+        /// <returns> Returns a filled list of the length 270 with the values of the (safety threshold -1).</returns>
+        public List<int> testListObstacle()
         {
             var filltestList2 = new List<int>();
-            for (int i=0;i<=270;i++)
+            for (int i = 0; i <= 270; i++)
             {
-                filltestList2.Add(( safety_threshold - 1));
+                filltestList2.Add((safety_threshold - 1));
             }
             return filltestList2;
 
         }
         
         /// <summary>
-        /// Method to check Logic, testlists with fake data are utilized. This method has a list as parameter
-        /// The above methods for testlists will be called first, so as to call the below method afterwards including the generated list as parameter
+        /// Method to check Logic, testlists with fake data are utilized.
+        /// The methods testListnoObstacle() and testListObstacle() will be called first, so as to call the below method afterwards 
+        /// including the generated list as parameter.
         /// </summary>
+        /// <param name = "testlist"> Array that shall be run in the logic of the Check() Method. </param>
+        /// <returns> Returns the boolean variable drive. True means there is no obstacle. The robot can safely frive forward. 
+        /// False means there is an obstacle so the robot has to stop immediately. </returns>
         public Boolean testCheck(List<int> testList)
         {
             Boolean drive = false;
-            // Checking the lists values from index 100 to 200
+            // checking the lists values from index 100 to 200
             for (int i = 100; i <= 200; i++)
             {
                 if(testList.Count == 0)
@@ -553,7 +563,7 @@ namespace HwrBerlin.HenryTasks
                     continue;
                 }
 
-                // Safety Threshold is bigger than the value in the testlist --> obstacle
+                // safety threshold is bigger than the value in the testlist --> obstacle
                 if (safety_threshold > testList[i])
                 {
                     // sets stop
@@ -561,7 +571,7 @@ namespace HwrBerlin.HenryTasks
                     Debug.WriteLine("drive == false");
                     drive = false;
                 }
-                // Safety Threshold is smaller or equal than the value in the testlist --> no onstacle
+                // safety threshold is smaller or equal than the value in the testlist --> no obstacle
                 else if (safety_threshold <= testList[i])
                 {
                     Debug.WriteLine("drive == true");
