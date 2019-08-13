@@ -322,6 +322,7 @@ namespace HwrBerlin.HenryTasks
                     _robot.Move(stop_mode);
                     randomLeftOrRight();
                     // drive = true;
+                    return;
                 }
                 else if (drive == true)
                 {
