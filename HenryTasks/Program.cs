@@ -192,22 +192,24 @@ namespace HwrBerlin.HenryTasks
                         /// disappeared Henry moves forward 
                             case "forward":
 
-                                Auto1 instanceAuto1_20 = new Auto1();
+                                Auto1 instanceAuto10 = new Auto1();
 
                                 while (true)
                                 {
-                                     instanceAuto1_20.Decide_basedonthresholdlist();
+                                     instanceAuto10.Decide_basedonthresholdlist();
                                 }
+                                
                             break;
 
                       /// Can Haves:
                       /// Henry drives forward. If he detects an obstacle he chooses randomly where to drive.
                          case "random":
 
-                            Auto1 instanceAuto10 = new Auto1();
+                            Auto1 instanceAuto20 = new Auto1();
+                            
                             while(true)
                             {
-                                instanceAuto10.randomDriveLeftOrRight();
+                                instanceAuto20.randomDriveLeftOrRight();
                             }
 
                          break;
@@ -216,11 +218,11 @@ namespace HwrBerlin.HenryTasks
                       /// Henry drives forward. If he detects an obstacle he chooses where to drive based on his scanning data.
                          case "autodrive":
 
-                            Auto1 instanceAuto20 = new Auto1();
+                            Auto1 instanceAuto30 = new Auto1();
 
                             while(true)
                             {
-                                instanceAuto20.driveLeftOrRight(); 
+                                instanceAuto30.driveLeftOrRight(); 
                             }
 
                          break;
