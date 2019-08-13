@@ -321,7 +321,7 @@ namespace HwrBerlin.HenryTasks
                     // sets velocity to zero so that Henry stops
                     _robot.Move(stop_mode);
                     randomLeftOrRight();
-                    drive = true;
+                    // drive = true;
                 }
                 else if (drive == true)
                 {
